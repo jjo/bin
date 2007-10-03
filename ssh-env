@@ -1,0 +1,22 @@
+#!/bin/sh
+#SSH_AUTH_SOCK=/tmp/ssh-jjo/agent-socket-14390; export SSH_AUTH_SOCK;
+#SSH_AGENT_PID=14391; export SSH_AGENT_PID;
+#echo Agent pid 14391;
+SSHENV_FILE="$HOME/.sshenv-$(hostname)"
+EXTRA_IDS="$HOME/.ssh/kosa/id_dsa"
+if [ -f $SSHENV_FILE ] ;then
+	. $SSHENV_FILE
+fi
+
+test -n "$SSH_AGENT_PID" && kill -0 $SSH_AGENT_PID && ssh-add -l | egrep -q .ssh/id
+if [ $? -gt 0 ] ;then
+	ssh-agent > $SSHENV_FILE && {
+		chmod 600 $SSHENV_FILE
+		. $SSHENV_FILE
+		EXTRAS=
+		for i in $EXTRA_IDS;do
+			ssh-add -l | egrep -q $i || EXTRAS="$EXTRAS $i"
+		done
+		ssh-add ~/.ssh/id_dsa ~/.ssh/identity $EXTRAS
+	}
+fi
