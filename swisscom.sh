@@ -1,6 +1,7 @@
 #!/bin/bash
 (( $(id -u) )) && exec sudo $0 $*
 PROVIDER=${1:-swisscom}
+ps -fC pppd | egrep -wq $PROVIDER ||
 pon $PROVIDER updetach $X || exit $?
 (
 	sleep 2
