@@ -24,4 +24,4 @@ xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 8 6 7 4
 #gconftool-2 --type bool --set $D/wheel_emulation_x_axis true
 #gconftool-2 --type int  --set $D/wheel_emulation_button 2
 #gconftool-2 --type bool --set $D/wheel_emulation true
-setxkbmap us intl
+setxkbmap -option ctrl:nocaps us intl
