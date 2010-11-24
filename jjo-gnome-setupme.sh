@@ -16,12 +16,12 @@ keybindings/switch_to_tab_6 <Control>6
 keybindings/switch_to_tab_7 <Control>7
 keybindings/switch_to_tab_8 <Control>8
 keybindings/switch_to_tab_9 <Control>9
+profiles/Default/use_theme_colors false
+profiles/Default/background_type solid
 profiles/Default/background_color #000000000000
 profiles/Default/foreground_color #FFFFFFFFFFFF
-profiles/Default/use_theme_colors false
 profiles/Default/use_menu_accelerators false
 profiles/Default/use_mnemonics false
-profiles/Default/background_type solid
 EOF
 
 
