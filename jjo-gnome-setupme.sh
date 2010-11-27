@@ -5,7 +5,9 @@ xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 8 2
 xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 8 6 7 4 5
 gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/options '[lv3	lv3:ralt_switch,ctrl	ctrl:nocaps]'
 while read var value;do
-	(set -x;gconftool -t string -s /apps/gnome-terminal/$var $value)
+	type=string
+	case "$value" in true|false) type=bool;; esac
+	(set -x;gconftool -t $type -s /apps/gnome-terminal/$var $value)
 done <<EOF
 keybindings/switch_to_tab_1 <Control>1
 keybindings/switch_to_tab_2 <Control>2
