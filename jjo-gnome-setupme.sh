@@ -33,7 +33,9 @@ done <<EOF
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation_button 2
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation true
 EOF
+set -x
 gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/options '[lv3	lv3:ralt_switch,ctrl	ctrl:nocaps]'
+#gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/layouts '[us,us	alt-intl]'
 
 #NOW!
 setxkbmap -option ctrl:nocaps us intl
