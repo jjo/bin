@@ -39,8 +39,14 @@ gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/
 
 #NOW!
 setxkbmap -option ctrl:nocaps us intl
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 8 1
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 8 2
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 8 6 7 4 5
+ids=$(xinput list | sed -rn '/IBM.TrackPoint/s/.*id=([0-9]+).*/\1/p')
+#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 8 1
+#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 8 2
+#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 8 6 7 4 5
+for id in $ids;do
+	xinput set-int-prop $id "Evdev Wheel Emulation" 8 1
+	xinput set-int-prop $id "Evdev Wheel Emulation Button" 8 2
+	xinput set-int-prop $id "Evdev Wheel Emulation Axes" 8 6 7 4 5
+done
 
 exit 0
