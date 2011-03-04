@@ -40,6 +40,7 @@ function FindProxyForURL(url, host) {
      )
      return '$proxy_GB'
   if (
+      shExpMatch(host, '*.pandora.com') ||
       shExpMatch(host, '*.hulu.com') ||
       shExpMatch(host, '*.sipgate.com')
      )
