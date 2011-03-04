@@ -3,11 +3,11 @@ set -e
 (
 dpkg -l x2goserver && exit 0
 echo deb http://x2go.obviously-nice.de/deb/ lenny main | sudo tee /etc/apt/sources.list.d/x2go.list
-sudo gpg --recv-keys C509840B96F89133
-sudo gpg -a --export C509840B96F89133 | sudo apt-key add -
+gpg --recv-keys C509840B96F89133
+gpg -a --export C509840B96F89133 | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install x2goserver sqlite
-sudo apt-get install gnome-session x2gognomebindings
+sudo apt-get install x2goserver sqlite # core stuff
+sudo apt-get install gnome-session x2gognomebindings # useful for gUI
 )
 (
 echo sqlite | sudo tee /etc/x2go/sql
