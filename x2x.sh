@@ -1,7 +1,4 @@
 #!/bin/bash
-#
-# Copyright 2008 Google Inc. All Rights Reserved.
-# Author: jjo@google.com (JuanJo Ciarlante)
 WHERE=${1:-west}
 if [  -z "$SSH_CONNECTION" -o -z "$DISPLAY" ];then
     echo "Intended to be used from: ssh -X ..."
