@@ -1,44 +1,31 @@
 #!/bin/sh
 
+
 xrandr() {
 	(set -x; exec /usr/bin/xrandr "$@" || exit 1)
 }
 
+BEST_VGA=$(/usr/bin/xrandr -q|egrep -A1 '^VGA'| sed -nr 's/^ +([^ ]+).*/\1/p')
+BEST_LCD=$(/usr/bin/xrandr -q|egrep -A1 '^LVDS'| sed -nr 's/^ +([^ ]+).*/\1/p')
+PRES_MODE=1024x768
 case "$1" in
     solo)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
+        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
         ;;
     pres)
-        xrandr --output VGA1 --mode 1024x768 --same-as LVDS1 --output LVDS1 --mode 1024x768
+        xrandr --output LVDS1 --mode $PRES_MODE --output VGA1 --same-as LVDS1 --mode $PRES_MODE
         ;;
-    pres19)
-        xrandr --output VGA1 --mode 1440x900 --same-as LVDS1 --output LVDS1 --mode 1024x768
-    	;;
-    pres24)
-        xrandr --output VGA1 --mode 1920x1200 --same-as LVDS1 --output LVDS1 --mode 1024x768
-    	;;
-    vga24)
-        xrandr --output VGA1 --mode 1920x1200 --output LVDS1 --off
-    	;;
     dual)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
-        xrandr --output VGA1 --mode 1440x900 --pos 0x0 --left-of LVDS1 --output LVDS1 --mode 1024x768 --right-of VGA1
+        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
+        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --left-of VGA1 --output VGA1 --mode $BEST_VGA --right-of LVDS1
         ;;
     dualup)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
-        xrandr --output VGA1 --mode 1440x900 --pos 0x0 --above LVDS1 --output LVDS1 --mode 1024x768 --below VGA1
-        ;;
-    dualup24)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
-        xrandr --output VGA1 --mode 1920x1200 --pos 0x0 --above LVDS1 --output LVDS1 --mode 1024x768 --below VGA1
-        ;;
-    dual24)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
-        xrandr --output LVDS1 --mode 1024x768 --left-of VGA1 --pos 0x0 --output VGA1 --mode 1920x1200 --right-of LVDS1 
+        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
+        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --below VGA1 --output VGA1 --mode $BEST_VGA
         ;;
     dualv)
-        xrandr --output VGA1 --off --output LVDS1 --mode 1024x768
-        xrandr --output VGA1 --mode 1920x1200 --pos 0x0 --right-of LVDS1 --rotate left --output LVDS1 --mode 1024x768 --left-of VGA1
+        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
+        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --left-of LVDS1 --output VGA1 --mode $BEST_VGA --right-of LVDS1 --rotate left
         ;;
     *)
         echo "Uso: monitor.sh $(sed -r -n 's/^[ \t]+([a-z0-9]+)\)/\t\1|/p' $0)"
