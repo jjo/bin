@@ -5,8 +5,11 @@
 N_PROXYS_PER_CC=3
 get_proxies_for() {
   local CC=$1
+  #local url=http://www.xroxy.com/proxy--Anonymous-$CC-ssl.htm|\
+  #local url="http://www.xroxy.com/proxylist.php?port=&type=Anonymous&ssl=&country=$CC&latency=&reliability=#table"
+  local url="http://www.xroxy.com/proxylist.php?port=&type=Anonymous&ssl=ssl&country=$CC&latency=&reliability=#table"
   local list=($(
-    curl -s http://www.xroxy.com/proxy--Anonymous-$CC-ssl.htm|\
+    curl -s $url|\
       sed -nr '/proxy:name=XROXY/s/.*host=([0-9.]+).*port=([0-9]+).*/\1:\2/p'
   ))
   local good_list
