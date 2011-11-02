@@ -6,6 +6,7 @@ while read var value;do
 	case "$value" in true|false) type=bool;; [0-9]*) type=int;; esac
 	(set -x;gconftool -t $type -s $var $value)
 done <<EOF
+/apps/gnome_settings_daemon/keybindings/screensaver Pause
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
