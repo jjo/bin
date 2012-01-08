@@ -1,31 +1,39 @@
-#!/bin/sh
+#!/bin/bash
 
 
 xrandr() {
 	(set -x; exec /usr/bin/xrandr "$@" || exit 1)
 }
 
-BEST_VGA=$(/usr/bin/xrandr -q|egrep -A1 '^VGA'| sed -nr 's/^ +([^ ]+).*/\1/p')
-BEST_LCD=$(/usr/bin/xrandr -q|egrep -A1 '^LVDS'| sed -nr 's/^ +([^ ]+).*/\1/p')
+typeset -a OUT_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(VGA|DP|HDMI)[0-9] conn'| awk '{ print $1 }'))
+typeset -a LCD_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^LVDS[0-9] conn'| awk '{ print $1 }'))
 PRES_MODE=1024x768
+OUT_DEV=${OUT_DEV_RES[0]}
+OUT_RES=${OUT_DEV_RES[1]}
+LCD_DEV=${LCD_DEV_RES[0]}
+LCD_RES=${LCD_DEV_RES[1]}
+
+echo LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV?}@${OUT_RES?} 
+sleep 2
+
 case "$1" in
     solo)
-        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
+        xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --off
         ;;
     pres)
-        xrandr --output LVDS1 --mode $PRES_MODE --output VGA1 --same-as LVDS1 --mode $PRES_MODE
+        xrandr --output $LCD_DEV --mode $PRES_MODE --output $OUT_DEV --same-as $LCD_DEV --mode $PRES_MODE
         ;;
     dual)
-        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
-        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --left-of VGA1 --output VGA1 --mode $BEST_VGA --right-of LVDS1
+        xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --off
+        xrandr --output $LCD_DEV --mode $LCD_RES --pos 0x0 --left-of $OUT_DEV --output $OUT_DEV --mode $OUT_RES --right-of $LCD_DEV
         ;;
     dualup)
-        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
-        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --below VGA1 --output VGA1 --mode $BEST_VGA
+        xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --off
+        xrandr --output $LCD_DEV --mode $LCD_RES --pos 0x0 --below $OUT_DEV --output $OUT_DEV --mode $OUT_RES
         ;;
     dualv)
-        xrandr --output LVDS1 --mode $BEST_LCD --output VGA1 --off
-        xrandr --output LVDS1 --mode $BEST_LCD --pos 0x0 --left-of LVDS1 --output VGA1 --mode $BEST_VGA --right-of LVDS1 --rotate left
+        xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --off
+        xrandr --output $LCD_DEV --mode $LCD_RES --pos 0x0 --left-of $LCD_DEV --output $OUT_DEV --mode $OUT_RES --right-of $LCD_DEV --rotate left
         ;;
     *)
         echo "Uso: monitor.sh $(sed -r -n 's/^[ \t]+([a-z0-9]+)\)/\t\1|/p' $0)"
