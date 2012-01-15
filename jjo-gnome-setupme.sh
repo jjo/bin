@@ -7,7 +7,8 @@ while read var value;do
 	case "$value" in true|false) type=bool;; [0-9]*) type=int;; "["*) type="list --list-type string";;esac
 	(set -x;gconftool -t $type -s $var "$value")
 done <<EOF
-/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:ralt_switch,ctrl	ctrl:nocaps]
+/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl	ctrl:nocaps]
+/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us]
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
@@ -42,8 +43,8 @@ while read schema key value;do
 	(set -x;gsettings set $schema $key "$value")
 done <<EOF
 org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
-org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps']
-org.gnome.libgnomekbd.keyboard layouts @as ['us	intl','us']
+org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:rctrl_rshift_toggle']
+org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
 EOF
 }
 
