@@ -50,13 +50,15 @@ EOF
 
 #NOW!
 setup_now(){
-setxkbmap -option ctrl:nocaps us altgr-intl
+(set -x
 ids=$(xinput list | sed -rn '/IBM.TrackPoint/s/.*id=([0-9]+).*/\1/p')
 for id in $ids;do
 	xinput set-int-prop $id "Evdev Wheel Emulation" 8 1
 	xinput set-int-prop $id "Evdev Wheel Emulation Button" 8 2
 	xinput set-int-prop $id "Evdev Wheel Emulation Axes" 8 6 7 4 5
 done
+setxkbmap -option ctrl:nocaps us altgr-intl
+)
 }
 
 setup_gconftool2
