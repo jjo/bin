@@ -7,8 +7,8 @@ while read var value;do
 	case "$value" in true|false) type=bool;; [0-9]*) type=int;; "["*) type="list --list-type string";;esac
 	(set -x;gconftool -t $type -s $var "$value")
 done <<EOF
-/desktop/gnome/peripherals/keyboard/kbd/options [lv3 lv3:rctrl_rshift_toggle,ctrl  ctrl:nocaps,grp grp:rctrl_rshift_toggle]
-/desktop/gnome/peripherals/keyboard/kbd/layouts [us  altgr-intl,us alt-intl,us,es]
+/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:rctrl_rshift_toggle]
+/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
