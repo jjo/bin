@@ -7,8 +7,8 @@ while read var value;do
 	case "$value" in true|false) type=bool;; [0-9]*) type=int;; "["*) type="list --list-type string";;esac
 	(set -x;gconftool -t $type -s $var "$value")
 done <<EOF
-/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl	ctrl:nocaps]
-/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us]
+/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:rctrl_rshift_toggle]
+/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
@@ -50,13 +50,15 @@ EOF
 
 #NOW!
 setup_now(){
-setxkbmap -option ctrl:nocaps us intl
+(set -x
 ids=$(xinput list | sed -rn '/IBM.TrackPoint/s/.*id=([0-9]+).*/\1/p')
 for id in $ids;do
 	xinput set-int-prop $id "Evdev Wheel Emulation" 8 1
 	xinput set-int-prop $id "Evdev Wheel Emulation Button" 8 2
 	xinput set-int-prop $id "Evdev Wheel Emulation Axes" 8 6 7 4 5
 done
+setxkbmap -option ctrl:nocaps us altgr-intl
+)
 }
 
 setup_gconftool2
