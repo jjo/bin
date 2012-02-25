@@ -4,6 +4,7 @@ while [ $# -ge 1 ];do
 	case "$1" in 
 	--home) HOSTS_AUTO="$HOSTS_AUTO 10.55.14.2 cx";shift;;
 	--um) HOSTS_AUTO="pitagoras pitagoras $HOSTS_AUTO";shift;;
+	--google) HOSTS_AUTO="carpediem carpediem";shift;;
 	*) break;;
 	esac
 done
