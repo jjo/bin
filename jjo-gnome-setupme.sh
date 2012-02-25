@@ -1,11 +1,14 @@
 #set -x
 #permanent in gnome:
+setup_gconftool2() {
 while read var value;do
 	type=string
 	case "$var" in \#*) continue;;esac
-	case "$value" in true|false) type=bool;; [0-9]*) type=int;; esac
-	(set -x;gconftool -t $type -s $var $value)
+	case "$value" in true|false) type=bool;; [0-9]*) type=int;; "["*) type="list --list-type string";;esac
+	(set -x;gconftool -t $type -s $var "$value")
 done <<EOF
+/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:rctrl_rshift_toggle]
+/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
@@ -21,6 +24,7 @@ done <<EOF
 /apps/gnome-terminal/profiles/Default/foreground_color #FFFFFFFFFFFF
 /apps/gnome-terminal/profiles/Default/use_menu_accelerators false
 /apps/gnome-terminal/profiles/Default/use_mnemonics false
+/apps/gnome_settings_daemon/keybindings/screensaver Pause
 /apps/metacity/global_keybindings/switch_to_workspace_1 <Alt>F1
 /apps/metacity/global_keybindings/switch_to_workspace_2 <Alt>F2
 /apps/metacity/global_keybindings/switch_to_workspace_3 <Alt>F3
@@ -33,20 +37,30 @@ done <<EOF
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation_button 2
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation true
 EOF
-set -x
-gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/options '[lv3	lv3:ralt_switch,ctrl	ctrl:nocaps]'
-#gconftool --list-type string -t list -s /desktop/gnome/peripherals/keyboard/kbd/layouts '[us,us	alt-intl]'
+}
+setup_gsettings(){
+while read schema key value;do
+	(set -x;gsettings set $schema $key "$value")
+done <<EOF
+org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
+org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:rctrl_rshift_toggle']
+org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
+EOF
+}
 
 #NOW!
-setxkbmap -option ctrl:nocaps us intl
+setup_now(){
+(set -x
 ids=$(xinput list | sed -rn '/IBM.TrackPoint/s/.*id=([0-9]+).*/\1/p')
-#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 8 1
-#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 8 2
-#xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 8 6 7 4 5
 for id in $ids;do
 	xinput set-int-prop $id "Evdev Wheel Emulation" 8 1
 	xinput set-int-prop $id "Evdev Wheel Emulation Button" 8 2
 	xinput set-int-prop $id "Evdev Wheel Emulation Axes" 8 6 7 4 5
 done
+setxkbmap -option ctrl:nocaps us altgr-intl
+)
+}
 
-exit 0
+setup_gconftool2
+test -x /usr/bin/gsettings && setup_gsettings
+setup_now
