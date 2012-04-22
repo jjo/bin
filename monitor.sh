@@ -29,7 +29,7 @@ wot="$1"
 dryrun="$2"
 case "$wot" in
     solo) #%usage Live only LCD display
-        xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --off
+        xrandr --output $LCD_DEV --mode $LCD_RES ${OUT_DEV:+--output $OUT_DEV --off}
         ;;
     pres) #%usage Presentation mode 1:1
 	LCD_RES=$PRES_MODE
