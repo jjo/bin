@@ -29,6 +29,8 @@ done <<EOF
 /apps/metacity/global_keybindings/switch_to_workspace_2 <Alt>F2
 /apps/metacity/global_keybindings/switch_to_workspace_3 <Alt>F3
 /apps/metacity/global_keybindings/switch_to_workspace_4 <Alt>F4
+/apps/compiz-1/plugins/unityshell/screen0/options/execute_command <Shift><Alt>F2
+/apps/compiz-1/plugins/unityshell/screen0/options/keyboard_focus = <Shift><Alt>F1
 #flap it:
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation false
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation_button 3
