@@ -7,7 +7,7 @@
 #
 # Requires: mplayer, oggenc for ogg(or lame for mp3).
 #
-# Author: JuanJo Ciarlante
+# Author: JuanJo Ciarlante <juanjosec@gmail.com>
 # License: GPLv2
 #
 help() {
@@ -71,4 +71,4 @@ echo "ENCCMD=$ENCCMD"
 # doit the sexy way...
 # use bash idiom to cleanly pipe from mplayer to $ENCCMD stdin
 set -x
-mplayer -nocache -quiet -ao pcm -aofile >($ENCCMD) $URL
+mplayer -nocache -quiet -ao pcm -ao pcm:file=>($ENCCMD) $URL
