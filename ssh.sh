@@ -6,6 +6,6 @@
 #   
 
 host="${@: -1}" ## last argument
-echo -ne "\ek${host%%.*}\e\\" ## host without "domain"
+[[ $TERM = screen ]] && echo -ne "\ek${host%%.[a-z]*[a-z]}\e\\" ## host without "domain"
 ssh "$@"
-echo -ne "\ek${SHELL##*/}\e\\"
+[[ $TERM = screen ]] && echo -ne "\ek${SHELL##*/}\e\\"
