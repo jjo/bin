@@ -2,6 +2,7 @@
 (test -n "$*" && echo "$@"  || cat - ) |
 sed     -e 's/:)/☺/g' \
         -e 's/:(/☹/g' \
+	-e 's,meh,¯\_(ツ)_/¯,g' \
 	-e 's/[.][.][.]/…/g' \
 	-e 's/delta/∆/g' \
 	-e 's/\bsum/∑/g' \
@@ -10,7 +11,9 @@ sed     -e 's/:)/☺/g' \
 	-e 's/PI/¶/g' \
 	-e 's/PHI/ø/g' \
 	-e 's/ae/æ/g' \
-	-e 's/oo/∞/g' \
+	-e 's/sun/☼/g' \
+	-e 's/moon/☽/g' \
+	-e 's/\boo\b/∞/g' \
 	-e 's/peace/☮/g' \
 	-e 's/yinyan/☯/g' \
 	-e 's/\bmale/♂/g' \
@@ -42,3 +45,11 @@ sed     -e 's/:)/☺/g' \
 	-e 's/(9)/❾/g' \
 	-e 's/(10)/❿/g' \
 	-e 's/=>/➠/g' \
+	-e 's/power/⚡/g' \
+	-e 's/flower/⚘/g' \
+	-e 's/nuclear/⚛/g' \
+	-e 's/sex/⚤/g' \
+	-e 's/music-1_4/♩/g' \
+	-e 's/music-1_8/♫/g' \
+	-e 's/music-1_16/♬/g' \
+
