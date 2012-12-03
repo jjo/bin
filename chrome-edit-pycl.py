@@ -26,7 +26,7 @@ import stat
 import optparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
-_default_port = 9292
+_default_port = 9299
 _default_editor = "gvim,-f"
 
 temp_has_delete=True
