@@ -29,6 +29,8 @@ done <<EOF
 /apps/metacity/global_keybindings/switch_to_workspace_2 <Alt>F2
 /apps/metacity/global_keybindings/switch_to_workspace_3 <Alt>F3
 /apps/metacity/global_keybindings/switch_to_workspace_4 <Alt>F4
+/apps/compiz-1/plugins/unityshell/screen0/options/execute_command <Shift><Alt>F2
+/apps/compiz-1/plugins/unityshell/screen0/options/keyboard_focus = <Shift><Alt>F1
 #flap it:
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation false
 /desktop/gnome/peripherals/TPPS@47@2@32@IBM@32@TrackPoint/wheel_emulation_button 3
@@ -58,6 +60,9 @@ for id in $ids;do
 	xinput set-int-prop $id "Evdev Wheel Emulation Axes" 8 6 7 4 5
 done
 setxkbmap -option ctrl:nocaps us altgr-intl
+#disable thinkpad trackpad
+trackpad_id=$(xinput list|sed -nr '/Synaptics.TouchPad/s/.*id=([0-9]+).*/\1/p')
+test -n "$trackpad_id" && xinput set-prop $trackpad_id "Device Enabled" 0
 )
 }
 
