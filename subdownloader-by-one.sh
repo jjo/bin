@@ -1,8 +1,10 @@
 #!/bin/bash
 # meh: workaround https://bugs.launchpad.net/subdownloader/+bug/722084:
 # subdownloader crashes on dirs with already downloaded subtitles
+ulimit -v 512000
 DIR="${1:?missing_dir}"
 TS=${2:-14}
+: ${L0:=en} ${L1:=es}
 subdownload_lang() {
 	local dir="${1:?missing dir}"
 	local lang="${2:?missing lang}"
@@ -19,5 +21,5 @@ subdownload_lang() {
 		echo "$DIFF" | mutt -s "${0##*/}: $subject" juanjosec+logger@gmail.com
 	}
 }
-subdownload_lang "$DIR" "en" -mtime -$TS
-subdownload_lang "$DIR" "es" -mtime -7 -mtime +$TS
+subdownload_lang "$DIR" "${L0?}" -mtime -$TS
+subdownload_lang "$DIR" "${L1?}" -mtime -7 -mtime +$TS
