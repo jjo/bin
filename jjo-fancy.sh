@@ -52,4 +52,5 @@ sed     -e 's/:)/☺/g' \
 	-e 's/music-1_4/♩/g' \
 	-e 's/music-1_8/♫/g' \
 	-e 's/music-1_16/♬/g' \
+	-e 's/[-]/—/g' \
 
