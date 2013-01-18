@@ -6,7 +6,10 @@ while read var value;do
 	type=string
 	case "$var" in \#*) continue;;esac
 	case "$value" in true|false) type=bool;; [0-9]*) type=int;; "["*) type="list --list-type string";;esac
-	(set -x;$toolname -t $type -s $var "$value")
+	case $toolname in
+		gconf*) (set -x;$toolname -t $type -s $var "$value");;
+		mate*)  (set -x;$toolname -t $type -s ${var//gnome/mate} "$value");;
+	esac
 done <<EOF
 /desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:rctrl_rshift_toggle]
 /desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
@@ -70,7 +73,6 @@ test -n "$trackpad_id" && xinput set-prop $trackpad_id "Device Enabled" 0
 test -x /usr/bin/gconftool      && setup_gconf gconftool
 test -x /usr/bin/mateconftool-2 && {
 	mateconftool-2 --set /apps/marco/general/button_layout --type string "close,minimize,maximize"
-
 }
 test -x /usr/bin/gsettings      && setup_gsettings
 setup_now
