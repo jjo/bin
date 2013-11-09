@@ -11,8 +11,9 @@ while read var value;do
 		mate*)  (set -x;$toolname -t $type -s ${var//gnome/mate} "$value");;
 	esac
 done <<EOF
-/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:rctrl_rshift_toggle]
-/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
+/desktop/gnome/peripherals/keyboard/kbd/options [lv3	lv3:rctrl_rshift_toggle,ctrl		ctrl:nocaps,grp	grp:shifts_toggle,ctrl	ctrl:nocaps]
+#/desktop/gnome/peripherals/keyboard/kbd/layouts [us	altgr-intl,us	alt-intl,us,es]
+/desktop/gnome/peripherals/keyboard/kbd/layouts [us	,es]
 /apps/gnome-terminal/keybindings/switch_to_tab_1 <Control>1
 /apps/gnome-terminal/keybindings/switch_to_tab_2 <Control>2
 /apps/gnome-terminal/keybindings/switch_to_tab_3 <Control>3
@@ -46,11 +47,13 @@ EOF
 }
 setup_gsettings(){
 while read schema key value;do
+	[[ $schema =~ \#.* ]] && continue
 	(set -x;gsettings set $schema $key "$value")
 done <<EOF
 org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
-org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:rctrl_rshift_toggle']
-org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
+org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:shifts_toggle']
+#org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
+org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'es']
 EOF
 }
 
@@ -72,6 +75,7 @@ test -n "$trackpad_id" && xinput set-prop $trackpad_id "Device Enabled" 0
 
 test -x /usr/bin/gconftool      && setup_gconf gconftool
 test -x /usr/bin/mateconftool-2 && {
+	setup_gconf mateconftool-2
 	mateconftool-2 --set /apps/marco/general/button_layout --type string "close,minimize,maximize"
 }
 test -x /usr/bin/gsettings      && setup_gsettings

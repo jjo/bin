@@ -3,6 +3,7 @@ IFACE_I=${2:?missing IFACE_I}
 IFACE_O=${3:?missing IFACE_O}
 ADHOC_SSID=${4:-jjoADHOC}
 KEY=${5:-off}
+NET=192.168.101
 __() {
 	echo "$@"
 }
@@ -31,12 +32,12 @@ _start(){
 	do_iptables -I
 	__ sysctl -w net/ipv4/ip_forward=1
 	case "$IFACE_I" in wlan*)
-		#test -n "$ADHOC_SSID" && __ iwconfig $IFACE_I mode ad-hoc essid $ADHOC_SSID key $KEY
+		test -n "$ADHOC_SSID" && __ iwconfig $IFACE_I mode ad-hoc essid $ADHOC_SSID key $KEY
 		;;
 	esac
-	__ ifconfig $IFACE_I 192.168.0.1
+	__ ifconfig $IFACE_I $NET.1
 	#__ dnsmasq -i $IFACE_I -F 192.168.0.50,192.168.0.150,12h -b -f -R -S 8.8.8.8 -S 8.8.4.4 -d \&
-	__ dnsmasq -i $IFACE_I -F 192.168.0.50,192.168.0.150,12h -b -f -R -S 8.8.8.8 -S 8.8.4.4 -d 
+	__ dnsmasq -i $IFACE_I -z --listen-address $NET.1 -F $NET.50,$NET.150,12h -b -f -R -S 8.8.8.8 -S 8.8.4.4 -d 
 	#__ sed -i \"/$IFACE_I/s/^#//\" /etc/network/interfaces
 	__ killall -1 NetworkManager
 }
