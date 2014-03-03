@@ -4,7 +4,7 @@
 xrandr() {
 	case "$dryrun" in 
 	-n) echo xrandr "$@";;
-        "") (sleep 2;set -x; exec /usr/bin/xrandr "$@" || exit 1)
+        "") (sleep 1;set -x; exec /usr/bin/xrandr "$@" || exit 1)
 	esac
 }
 
@@ -28,15 +28,18 @@ echo LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV?}@${OUT_RES?}
 wot="$1"
 dryrun="$2"
 case "$wot" in
-    solo) #%usage Live only LCD display
+    solo)    #%usage LCD display only
         xrandr --output $LCD_DEV --mode $LCD_RES ${OUT_DEV:+--output $OUT_DEV --off}
         ;;
-    pres) #%usage Presentation mode 1:1
+    soloext) #%usage External output only
+        xrandr --output $OUT_DEV --mode $OUT_RES ${LCD_DEV:+--output $LCD_DEV --off}
+	;;
+    pres*)   #%usage Presentation mode 1:1
 	LCD_RES=$PRES_MODE
 	OUT_RES=$PRES_MODE
         xrandr --output $LCD_DEV --mode $LCD_RES --output $OUT_DEV --same-as $LCD_DEV --mode $OUT_RES
         ;;
-    dualleft|dualright|dualup|dualdown|dualleftv|dualrightv) #%usage eg. dualleft, dualright, dualrightv (+vertical)
+    dualleft|dualright|dualup|dualdown|dualleftv|dualrightv) #%usage dual<ext_position>
 	xtra=""
 	# eg: dualrightv -> right-of --rotate left (vertical external)
 	case "$wot" in *v) xtra="--rotate left";wot=${wot%v};; esac
