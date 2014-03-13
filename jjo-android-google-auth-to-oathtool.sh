@@ -9,7 +9,7 @@
 # oathtool --totp -b XXXXXXXXXXXXXXXXXXXXXXXXXX 	# Dropbox:[...]@[...]
 #
 # You may want to backup these :)
-#   ./jjo-android-google-auth-to-oathtool.sh | gpg -o google-auth-oathtool.bak.gpg
+#   ./jjo-android-google-auth-to-oathtool.sh | gpg -e -o google-auth-oathtool.bak.gpg
 # ... and/or backup the output from:
 # adb shell su root sqlite3 /data/data/com.google.android.apps.authenticator2/databases/databases .dump
 
