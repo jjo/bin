@@ -1,6 +1,6 @@
 #!/bin/bash
 # Print oathtool commands to stdout that do produce same OTPs
-# as Google Authenticator App, by steal^Wusing its using keys.
+# as Google Authenticator App, by steal^Wusing its saved keys.
 # Requires rooted android.
 #
 # Example (obfuscated) output:
