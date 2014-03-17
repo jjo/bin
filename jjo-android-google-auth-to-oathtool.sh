@@ -9,7 +9,7 @@
 # oathtool --totp -b XXXXXXXXXXXXXXXXXXXXXXXXXX 	# Dropbox:[...]@[...]
 #
 # You may want to see exactly the same OTPs that your phone is showing ;):
-#   ./jjo-android-google-auth-to-oathtool.sh | sh -x
+#   ./jjo-android-google-auth-to-oathtool.sh | sh -v
 # You may want to backup these keys:
 #   ./jjo-android-google-auth-to-oathtool.sh | gpg -e -o google-auth-oathtool.bak.gpg
 # ... and/or backup the output from:
