@@ -10,7 +10,7 @@
 #
 # You may want to see exactly the same OTPs that your phone is showing ;):
 #   ./jjo-android-google-auth-to-oathtool.sh | sh -x
-# You may want to backup these :)
+# You may want to backup these keys:
 #   ./jjo-android-google-auth-to-oathtool.sh | gpg -e -o google-auth-oathtool.bak.gpg
 # ... and/or backup the output from:
 # adb shell su root sqlite3 /data/data/com.google.android.apps.authenticator2/databases/databases .dump
