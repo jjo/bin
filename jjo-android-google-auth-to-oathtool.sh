@@ -18,6 +18,6 @@
 adb shell su root sqlite3 /data/data/com.google.android.apps.authenticator2/databases/databases \
    "select email, secret, counter, type from accounts" | \
    awk -v FS='|' ' {
-     x=$4? sprintf (" -c %4d", $3) : sprintf (" --totp ");
-     printf ("oathtool %s -b %s \t# %s\n", x, $2, $1)
+     x=$4? sprintf ("-c %d", $3) : sprintf ("--totp");
+     printf ("oathtool %6s -b %s \t# %s\n", x, $2, $1)
    }'
