@@ -2,7 +2,7 @@
 # Install kernel, initrd for dockstar u-boot, see
 # http://forum.doozan.com/read.php?2,12096
 set -xeu
-V=${1:-missing version, eg: 4.0.0-kirkwood-tld-2}
+V=${1:?missing version, eg: 4.0.0-kirkwood-tld-2}
 DTS=dts/kirkwood-dockstar.dtb
 ls -la zImage-$V vmlinuz-$V initrd.img-$V $DTS
 cp -a zImage-$V  zImage.fdt
