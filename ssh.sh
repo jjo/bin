@@ -7,7 +7,13 @@
 
 SSH_OPTS='-o ServerAliveInterval=300 -C'
 host="${@: -1}" ## last argument
-[[ $TERM = screen ]] && echo -ne "\ek${host%%.[a-z]*[a-z]}\e\\" ## host without "domain"
+
+# remove some common prefixes:
+host=${host#maas.}
+# remove everything after 1st dot (~domain)
+host=${host%%.[a-z]*[a-z]}
+
+[[ $TERM = screen ]] && echo -ne "\ek${host}\e\\"
 if [ -n "$MOSH_GATE" -a "$host" != "$MOSH_GATE" ];then
 	echo "Using MOSH_GATE: $MOSH_GATE"
 	# -A requires mosh built from
