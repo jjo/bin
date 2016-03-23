@@ -27,18 +27,24 @@ name=${2:?missing name. $(help)}
 
 # Create cloud-init userdata with my account, ssh keys in it
 (
+group=$(groups | sed 's/ .*//')
 cat << EOF
 #cloud-config
+groups:
+  - ${group}
 users:
   - name: $USER
     shell: /bin/bash
-    uid: $(id -u)
-    gid: $(id -g)
+    primary-group: ${group}
+    #uid: $(id -u)
+    #gid: $(id -g)
     sudo: ALL=(ALL) NOPASSWD:ALL
     #ssh-import-id: [$USER]
     ssh_authorized_keys:
       - $(cat ~/.ssh/id_rsa.pub)
-
+runcmd:
+ - usermod -u $(id -u) $USER
+ - groupmod -g $(id -g) ${group}
 EOF
 ) | (set -x; lxc config set $name user.user-data -)
 
