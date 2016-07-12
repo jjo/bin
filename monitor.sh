@@ -52,20 +52,20 @@ case "$wot" in
         xrandr ${OUT_DEV1:+--output $OUT_DEV1 --off} ${OUT_DEV2:+--output $OUT_DEV2 --off} --output $LCD_DEV --mode $LCD_RES 
         xrandr --output $LCD_DEV --mode $LCD_RES --pos 0x0 --output $OUT_DEV1 --mode $OUT_RES1 --$where $LCD_DEV $xtra
         ;;
-    h2v3)   #%usage Dual Horiz(left) Vert(right) 
+    v2h3)   #%usage Dual Horiz(left) Vert(right)
+        xrandr --output $LCD_DEV --off
+        xrandr --output DP3
+        xrandr --output HDMI2 --right-of HDMI2 --rotate right
+	;;
+    h2v3)   #%usage Dual Horiz(left) Vert(right)
         xrandr --output $LCD_DEV --off
         xrandr --output HDMI2
-        xrandr --output HDMI3 --right-of HDMI2 --rotate right
+        xrandr --output DP3 --right-of HDMI2 --rotate right
 	;;
     h2h3)   #%usage Dual Horiz(left) Horiz(right)
         xrandr --output $LCD_DEV --off
         xrandr --output HDMI2
-        xrandr --output HDMI3 --right-of HDMI2
-	;;
-    h2h3)   #%usage Dual Vert(left) Horiz(right)
-        xrandr --output $LCD_DEV --off
-        xrandr --output HDMI2
-        xrandr --output HDMI3 --right-of HDMI2 --rotate normal
+        xrandr --output DP3 --right-of HDMI2
 	;;
     *)
         usage
