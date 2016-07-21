@@ -17,4 +17,4 @@ file=${3?missing file, eg: foo.S01E01.nl.srt}
 cat "${file?}" |\
   sed -u -r -e 's/<.?[fF]ont[^>]*>//ig' -e '/->/s/,/./g'|\
   stdbuf -o0 $TRANS -b ${src?}:${dst?} |\
-  sed -u -r -e '/- u003e/s/: /:/g' -e '/- u003e/s/[ ,]([0-9]{3})/.\1/g' -e 's/- u003e/-->/'
+  sed -u -r -e '/- ?u003e/s/: /:/g' -e '/- ?u003e/s/[ ,]([0-9]{3})/.\1/g' -e 's/- u003e/-->/'

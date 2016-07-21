@@ -7,8 +7,7 @@ echo "URL=$URL"
 extra=""
 VLC=nvlc
 if [[ "$1" == --save ]];then
-    VLC=cvlc
-    extra="--sout #std{access=file,mux=raw,dst=$2}"
+    exec ffmpeg -i "$URL" -c copy "$2"
 fi
 set -x
 exec $VLC $extra $URL
