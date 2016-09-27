@@ -4,6 +4,7 @@ test "$1" = "-n" && LAST="s/\n//"
 (test -n "$*" && echo "$@"  || cat - ) |
 sed     -e 's/:)/☺/g' \
         -e 's/:(/☹/g' \
+        -e 's/*/•/g' \
 	-e 's,meh,¯\_(ツ)_/¯,g' \
 	-e 's/[.][.][.]/…/g' \
 	-e 's/delta/∆/g' \

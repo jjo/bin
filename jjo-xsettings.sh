@@ -1,5 +1,4 @@
 #!/bin/bash
-setxkbmap -option ctrl:nocaps us altgr-intl
 # Vertical mouse: setup button-map
 vmouse_id="$(xinput -list |sed -nr 's/.*Kingsis.*id=([0-9]+).*/\1/p')"
 test -n "$vmouse_id" && (set -x;xinput set-button-map "$vmouse_id" 1 2 3 4 5 6 7 8 9 10 11 12 13 14)
@@ -9,4 +8,9 @@ test -n "$trackpoint_id" && (set -x; xinput disable $trackpoint_id ; xinput enab
 sleep 0.2 #(?), needed anyway to effectively disable ->
 # Touchpad: disable
 touchpad_id=$(xinput list|sed -nr '/Synaptics.TouchPad/s/.*id=([0-9]+).*/\1/p')
-test -n "$touchpad_id" && (set -x;xinput set-prop "$touchpad_id" "Device Enabled" 0; xinput disable "$touchpad_id")
+# test -n "$touchpad_id" && (set -x;xinput set-prop "$touchpad_id" "Device Enabled" 0; xinput disable "$touchpad_id")
+(set -x
+xinput set-prop ${touchpad_id} "Synaptics Finger" 20 40 255
+xinput set-prop ${touchpad_id} "Synaptics Noise Cancellation" 20 20
+)
+setxkbmap -option ctrl:nocaps us altgr-intl
