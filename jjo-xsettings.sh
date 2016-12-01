@@ -13,4 +13,10 @@ touchpad_id=$(xinput list|sed -nr '/Synaptics.TouchPad/s/.*id=([0-9]+).*/\1/p')
 xinput set-prop ${touchpad_id} "Synaptics Finger" 20 40 255
 xinput set-prop ${touchpad_id} "Synaptics Noise Cancellation" 20 20
 )
+(set -x
+synclient Palmdetect=1
+synclient TouchpadOff=1
+synclient PalmMinWidth=8
+synclient PalmMinZ=100
+)
 setxkbmap -option ctrl:nocaps us altgr-intl
