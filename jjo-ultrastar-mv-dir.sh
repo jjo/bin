@@ -43,8 +43,8 @@ discover_final_dest() {
 
 typeset -i num_mv=0 num_total=0 num_partial
 for i in "${@}";do
-	((num_total++))
 	[ ! -d "${i}" ] && continue
+	((num_total++))
 	ls "${i}"/*.part >&/dev/null && {
 		#echo "WARN: incompleto: ${i}"
 		((num_partial++))
