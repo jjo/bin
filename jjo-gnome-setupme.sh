@@ -54,6 +54,13 @@ org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
 org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:shifts_toggle']
 #org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
 org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'es']
+org.mate.Marco.global-keybindings panel-run-dialog '<Shift><Alt>F2'
+org.mate.Marco.global-keybindings panel-main-menu '<Shift><Alt>F1'
+org.mate.Marco.window-keybindings close '<Shift><Alt>F4'
+org.mate.Marco.global-keybindings switch-to-workspace-1 '<Alt>F1'
+org.mate.Marco.global-keybindings switch-to-workspace-2 '<Alt>F2'
+org.mate.Marco.global-keybindings switch-to-workspace-3 '<Alt>F3'
+org.mate.Marco.global-keybindings switch-to-workspace-4 '<Alt>F4'
 EOF
 }
 
@@ -72,6 +79,17 @@ trackpad_id=$(xinput list|sed -nr '/Synaptics.TouchPad/s/.*id=([0-9]+).*/\1/p')
 test -n "$trackpad_id" && xinput set-prop $trackpad_id "Device Enabled" 0
 )
 }
+setup_dconf() {
+	dconf write /org/mate/desktop/keybindings/custom0/binding "'<Mod4>1'"
+	dconf write /org/mate/desktop/keybindings/custom0/name "'terminator'"
+	dconf write /org/mate/desktop/keybindings/custom0/action "'/home/jjo/bin/jjo-run1.sh terminator'"
+	dconf write /org/mate/desktop/keybindings/custom1/binding "'<Mod4>2'"
+	dconf write /org/mate/desktop/keybindings/custom1/name "'chromium-browser'"
+	dconf write /org/mate/desktop/keybindings/custom1/action "'/home/jjo/bin/jjo-run1.sh chromium-browser'"
+	dconf write /org/mate/desktop/keybindings/custom2/binding "'<Mod4>3'"
+	dconf write /org/mate/desktop/keybindings/custom2/name "'google-chrome'"
+	dconf write /org/mate/desktop/keybindings/custom2/action "'/home/jjo/bin/jjo-run1.sh google-chrome'"
+}
 
 test -x /usr/bin/gconftool      && setup_gconf gconftool
 test -x /usr/bin/mateconftool-2 && {
@@ -79,4 +97,5 @@ test -x /usr/bin/mateconftool-2 && {
 	mateconftool-2 --set /apps/marco/general/button_layout --type string "close,minimize,maximize"
 }
 test -x /usr/bin/gsettings      && setup_gsettings
+test -x /usr/bin/dconf          && setup_dconf
 setup_now
