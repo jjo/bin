@@ -6,7 +6,7 @@
 #URL=$(wget -qO- http://www.mdzradio.com/player.php| sed -rn '/androidButton/s|.*(http://.*.mp3)".*|\1|p')
 # 2017-02-06:
 TUNEIN_URL="http://tunein.com/$(curl -s http://tunein.com/search/?query=mdzradio|egrep -o '/radio/MDZ[^"]+'|sort|uniq)"
-URL=$(curl -s $(curl -s ${TUNEIN_URL:?} |sed -rn 's/.*StreamUrl.:.([^"]+)".*/http:\1/p')|jq -r '.Streams[-1].Url')
+URL=$(curl -s $(curl -s ${TUNEIN_URL:?} |sed -rn 's/.*StreamUrl.:.([^"]+)".*/http:\1/p')|jq -r '.Streams[length].Url')
 
 echo "URL=$URL"
 extra=""
