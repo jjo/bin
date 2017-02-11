@@ -7,23 +7,26 @@ tunein_search() {
    echo "*** streamurl=${streamurl:?}" >&2
    echo ${streamurl}
 }
-# Use $* as tunein query
-if [ -n "$*" ]; then
-    search="$*"
-# else infer it from mplayer-<QUERY>.sh symlink name
-else
-    search=${0##*mplayer-}
-    search=${search%.sh}
-    # except that mplayer-tunein.sh without args makes no sense
-    [[ $search == tunein ]] && search=
-fi
-URL=$(tunein_search "$search") || exit 1
-: ${URL:?}
-extra=""
-VLC=nvlc
-VLC=mplayer
+case "$0" in
+    *mplayer-tunein.sh)
+	# search is 1st arg only
+        search="$1"
+        shift
+	;;
+    *mplayer-*.sh)
+	# infer search from mplayer-<QUERY>.sh symlink
+        search=${0##*mplayer-}
+        search=${search%.sh}
+	;;
+    *)  exit 1;;
+esac
+
+CMD=mplayer
 if [[ "$1" == --save ]];then
-    exec ffmpeg -i "$URL" -c copy "$2"
+    CMD="ffmpeg -c copy $2 -i"
+    shift 2
 fi
+URL=$(tunein_search "${search:?}") || exit 1
+: ${URL:?}
 set -x
-exec $VLC $extra $URL
+exec $CMD $extra $URL
