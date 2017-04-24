@@ -62,6 +62,7 @@ org.mate.Marco.global-keybindings switch-to-workspace-2 '<Alt>F2'
 org.mate.Marco.global-keybindings switch-to-workspace-3 '<Alt>F3'
 org.mate.Marco.global-keybindings switch-to-workspace-4 '<Alt>F4'
 org.mate.SettingsDaemon.plugins.media-keys screensaver 'Pause'
+org.gnome.shell.overrides workspaces-only-on-primary false
 EOF
 }
 
