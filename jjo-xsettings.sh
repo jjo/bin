@@ -19,4 +19,6 @@ synclient TouchpadOff=1
 synclient PalmMinWidth=8
 synclient PalmMinZ=100
 )
+(set -x
 setxkbmap -option ctrl:nocaps us altgr-intl
+)
