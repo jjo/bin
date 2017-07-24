@@ -1,8 +1,7 @@
 #!/bin/bash
 
-
 xrandr() {
-	case "$dryrun" in 
+	case "$dryrun" in
 	-n) echo xrandr "$@";;
         "") (sleep 1;set -x; exec /usr/bin/xrandr "$@" || exit 1)
 	esac
@@ -15,8 +14,8 @@ usage() {
 
 test $# -gt 0 || usage
 
-typeset -a OUT_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(VGA|DP|HDMI)[0-9] conn'| awk '/^[^-]/{ print $1 }'))
-typeset -a LCD_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^LVDS[0-9] conn'| awk '{ print $1 }'))
+typeset -a OUT_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(VGA|DP-1|DP-2|HDMI)-?[0-9] conn'| awk '/^[^-]/{ print $1 }'))
+typeset -a LCD_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(LVDS[0-9]|eDP-[0-9]) conn'| awk '{ print $1 }'))
 PRES_MODE=1024x768
 OUT_DEV1=${OUT_DEV_RES[0]}
 OUT_RES1=${OUT_DEV_RES[1]}
@@ -25,10 +24,14 @@ OUT_RES2=${OUT_DEV_RES[3]}
 LCD_DEV=${LCD_DEV_RES[0]}
 LCD_RES=${LCD_DEV_RES[1]}
 
-echo LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV1?}@${OUT_RES1?} ${OUT_DEV2:+${OUT_DEV2}@${OUT_RES2}}
-
+case "$1" in
+	-n) dryrun="$1"; shift;;
+esac
 wot="$1"
-dryrun="$2"
+shift; test -n "$1" && LCD_RES="$1"
+shift; test -n "$1" && OUT_RES1="$1"
+shift; test -n "$1" && OUT_RES2="$1"
+echo LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV1?}@${OUT_RES1?} ${OUT_DEV2:+${OUT_DEV2}@${OUT_RES2}}
 case "$wot" in
     solo)    #%usage LCD display only
         xrandr ${OUT_DEV1:+--output $OUT_DEV1 --off} ${OUT_DEV2:+--output $OUT_DEV2 --off}
@@ -52,20 +55,37 @@ case "$wot" in
         xrandr ${OUT_DEV1:+--output $OUT_DEV1 --off} ${OUT_DEV2:+--output $OUT_DEV2 --off} --output $LCD_DEV --mode $LCD_RES 
         xrandr --output $LCD_DEV --mode $LCD_RES --pos 0x0 --output $OUT_DEV1 --mode $OUT_RES1 --$where $LCD_DEV $xtra
         ;;
-    v2h3)   #%usage Dual Horiz(left) Vert(right)
-        xrandr --output $LCD_DEV --off
-        xrandr --output DP3
-        xrandr --output HDMI2 --right-of HDMI2 --rotate right
+    h3v2)   #%usage Dual Horiz(left) Vert(right)
+	[[ $LCD_DEV =~ eDP-[0-9] ]] || \
+            xrandr --output $LCD_DEV --off
+        xrandr --output $OUT_DEV2 --primary
+	[[ $LCD_DEV =~ eDP-[0-9] ]] && \
+	    xrandr --output $LCD_DEV --below $OUT_DEV2 --mode $LCD_RES
+        xrandr --output $OUT_DEV1 --right-of $OUT_DEV2 --rotate right
 	;;
     h2v3)   #%usage Dual Horiz(left) Vert(right)
-        xrandr --output $LCD_DEV --off
-        xrandr --output HDMI2
-        xrandr --output DP3 --right-of HDMI2 --rotate right
+	[[ $LCD_DEV =~ eDP-[0-9] ]] || \
+            xrandr --output $LCD_DEV --off
+        xrandr --output $OUT_DEV1 --primary
+	[[ $LCD_DEV =~ eDP-[0-9] ]] && \
+	    xrandr --output $LCD_DEV --below $OUT_DEV1 --mode $LCD_RES
+        xrandr --output $OUT_DEV2 --right-of $OUT_DEV1 --rotate right
 	;;
     h2h3)   #%usage Dual Horiz(left) Horiz(right)
-        xrandr --output $LCD_DEV --off
-        xrandr --output HDMI2
-        xrandr --output DP3 --right-of HDMI2
+	[[ $LCD_DEV =~ eDP-[0-9] ]] || \
+            xrandr --output $LCD_DEV --off
+        xrandr --output $OUT_DEV1 --primary
+	[[ $LCD_DEV =~ eDP-[0-9] ]] && \
+	    xrandr --output $LCD_DEV --below $OUT_DEV1 --mode $LCD_RES
+        xrandr --output $OUT_DEV2 --right-of $OUT_DEV1
+	;;
+    h3h2)   #%usage Dual Horiz(left) Horiz(right)
+	[[ $LCD_DEV =~ eDP-[0-9] ]] || \
+            xrandr --output $LCD_DEV --off
+        xrandr --output $OUT_DEV2 --primary
+	[[ $LCD_DEV =~ eDP-[0-9] ]] && \
+	    xrandr --output $LCD_DEV --below $OUT_DEV2 --mode $LCD_RES
+        xrandr --output $OUT_DEV1 --right-of $OUT_DEV2
 	;;
     *)
         usage
