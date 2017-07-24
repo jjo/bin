@@ -53,7 +53,7 @@ done <<EOF
 org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
 org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:shifts_toggle']
 #org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
-org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'es']
+org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl']
 org.mate.Marco.global-keybindings panel-run-dialog '<Shift><Alt>F2'
 org.mate.Marco.global-keybindings panel-main-menu '<Shift><Alt>F1'
 org.mate.Marco.window-keybindings close '<Shift><Alt>F4'

@@ -8,7 +8,7 @@ test -n "$trackpoint_id" && (set -x; xinput disable $trackpoint_id ; xinput enab
 sleep 0.2 #(?), needed anyway to effectively disable ->
 # Touchpad: disable
 touchpad_id=$(xinput list|sed -nr '/Synaptics.TouchPad/s/.*id=([0-9]+).*/\1/p')
-# test -n "$touchpad_id" && (set -x;xinput set-prop "$touchpad_id" "Device Enabled" 0; xinput disable "$touchpad_id")
+test -n "$touchpad_id" && (set -x;xinput set-prop "$touchpad_id" "Device Enabled" 0; xinput disable "$touchpad_id")
 (set -x
 xinput set-prop ${touchpad_id} "Synaptics Finger" 20 40 255
 xinput set-prop ${touchpad_id} "Synaptics Noise Cancellation" 20 20
