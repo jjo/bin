@@ -10,8 +10,9 @@ for i in /sys/bus/{pci,usb}/devices/*/power/control;do echo auto > $i;done
 echo '0' > '/proc/sys/kernel/nmi_watchdog';
 
 
-iwconfig wlan0 power on
-iwconfig wlan0 power timeout 500ms
+WL_DEV=$(ip li|egrep -o 'wl\w+')
+iwconfig $WL_DEV power on
+iwconfig $WL_DEV power timeout 500ms
 #for i in /sys/bus/usb/devices/*/power/autosuspend; do echo 1 > $i; done
 sudo service bluetooth stop
 for i in rfcomm bnep btusb bluetooth;do modprobe -r $i;done
