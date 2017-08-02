@@ -16,11 +16,15 @@ cache() {
     return 0
 }
 tunein_search() {
-   local query=${*:?}
+   local query=${*:?} streamurl
    query="${query// /+}"
-   local tunein_search_result=$(curl -s "http://tunein.com/search/?query=$query"|egrep -o '/radio/[^"]+-s[^"]+'|sort|uniq)
-   local tunein_url=http://tunein.com/${tunein_search_result:?}
-   local streamurl=$(curl -s $(curl -s ${tunein_url:?} |sed -rn 's/.*StreamUrl.:.([^"]+)".*/http:\1/p')|jq -r '.Streams[0].Url')
+   if [ -f ~/etc/radiocache.d/${query} ]; then
+       streamurl=$(cat ~/etc/radiocache.d/${query})
+   else
+       local tunein_search_result=$(curl -s "http://tunein.com/search/?query=$query"|egrep -o '/radio/[^"]+-s[^"]+'|sort|uniq)
+       local tunein_url=http://tunein.com/${tunein_search_result:?}
+       streamurl=$(curl -s $(curl -s ${tunein_url:?} |sed -rn 's/.*StreamUrl.:.([^"]+)".*/http:\1/p')|jq -r '.Streams[0].Url')
+   fi
    echo "*** streamurl=${streamurl:?}" >&2
    echo ${streamurl}
 }
