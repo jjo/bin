@@ -4,7 +4,7 @@ import requests
 from jinja2 import Template
 
 URL = "https://poloniex.com/public"
-COINS = "BTC ZEC ETH DASH OMNI XMR NOTE DGB DOGE".split()
+COINS = "BTC BCH ZEC ETH DASH OMNI XMR NOTE DGB DOGE".split()
 
 r = requests.get(URL, params={'command': 'returnTicker'})
 tickers = r.json()
