@@ -88,4 +88,5 @@ sed     -e 's/:)/☺/g' \
 	-e 's/monkey/🐵/g' \
 	-e 's/cat/😺/g' \
 	-e 's/unicorn/🐴`╾/g' \
+	-e 's/hourglass/⏳/g' \
 	-e "$LAST"
