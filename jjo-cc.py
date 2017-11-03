@@ -1,13 +1,52 @@
 #!/usr/bin/env python3
 # Report some crytocurrencies value by BTC, USD
+import asyncio
 import requests
 from jinja2 import Template
 
-URL = "https://poloniex.com/public"
-COINS = "BTC BCH ZEC ETH DASH OMNI XMR NOTE DGB DOGE POT".split()
+# Q&D from several sources
+POLONIEX_URL = "https://poloniex.com/public"
+POLONIEX_COINS = "BTC BCH ZEC ETH DASH OMNI XMR NOTE DGB DOGE POT LSK".split()
+HITBTC_URL = "https://api.hitbtc.com/api/1/public/%sBTC/ticker"
+HITBTC_COINS = "TKN BTG".split()
 
-r = requests.get(URL, params={'command': 'returnTicker'})
-tickers = r.json()
+
+def get_poloniex(coins):
+    "Poloniex returns all tickers in a single call"
+    assert isinstance(coins, list)
+    r = requests.get(POLONIEX_URL, params={'command': 'returnTicker'})
+    tickers = r.json()
+    return tickers
+
+
+def get_hitbtc(coin):
+    "Hitbtc requires one call per ticker (driven by asyncio below)"
+    assert isinstance(coin, str)
+    entry = requests.get(HITBTC_URL % coin).json()
+    ticker = {"BTC_" + coin: {
+        "last": entry["last"],
+        "percentChange": "{:.8f}".format(
+            float(entry["last"]) / (float(entry["open"])) - 1)
+    }}
+    return ticker
+
+
+async def fetch():
+    loop = asyncio.get_event_loop()
+    futures_poloniex = [
+        loop.run_in_executor(None, get_poloniex, POLONIEX_COINS)]
+    futures_hitbtc = [
+        loop.run_in_executor(None, get_hitbtc, coin) for coin in HITBTC_COINS]
+    futures = futures_poloniex + futures_hitbtc
+    tickers = {}
+    for response in await asyncio.gather(*futures):
+        tickers.update(response)
+    return tickers
+
+loop = asyncio.get_event_loop()
+tickers = loop.run_until_complete(fetch())
+
+COINS = POLONIEX_COINS + HITBTC_COINS
 
 for coin in COINS:
     usd_coin = "USDT_" + coin
