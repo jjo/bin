@@ -1,13 +1,10 @@
 #!/bin/bash
 # Auto-generate a grub.cfg suitable for USB Pendrive/SD
-# asumes files at /boot/iso.
-#
 # Author: JuanJo Ciarlante <juanjosec@gmail.com>
 # License: GPLv3
 #
 # vim: si sw=2 ts=2 et
 shopt -s nullglob
-
 for i in ubuntu*.iso linuxmint*;do
   case "$i" in *amd64*) k=vmlinuz.efi;; *) k=vmlinuz;; esac
 cat <<EOF
@@ -21,22 +18,22 @@ EOF
 done
 
 for i in tails*.iso;do
-  for j in "" 2;do
 cat <<EOF
-menuentry "$i $j" {
+menuentry "$i" {
   set isofile="/boot/iso/$i"
-  loopback loop \$isofile
-  linux (loop)/live/vmlinuz$j isoloop=\$isofile boot=live config live-media=removable nopersistent noprompt timezone=Etc/UTC block.events_dfl_poll_msecs=1000 splash noautologin module=Tails quiet
-  initrd (loop)/live/initrd$j.img
+  loopback loop \${isofile}
+  linux (loop)/live/vmlinuz boot=live findiso=\${isofile} config apparmor=1 security=apparmor nopersistence noprompt timezone=Etc/UTC block.events_dfl_poll_msecs=1000 splash noautologin module=Tails kaslr slab_nomerge slub_debug=FZP mce=0 vsyscall=none page_poison=1 union=aufs quiet
+     
+  initrd (loop)/live/initrd.img
 }
-menuentry "$i $j failsafe" {
+menuentry "$i failsafe" {
   set isofile="/boot/iso/$i"
-  loopback loop \$isofile
-  linux (loop)/live/vmlinuz$j isoloop=\$isofile boot=live config live-media=removable nopersistent noprompt timezone=Etc/UTC block.events_dfl_poll_msecs=1000 splash noautologin module=Tails noapic noapm nodma nomce nolapic nomodeset nosmp vga=normal
-  initrd (loop)/live/initrd$j.img
+  loopback loop \${isofile}
+  linux (loop)/live/vmlinuz boot=live findiso=\${isofile} config apparmor=1 security=apparmor nopersistence noprompt timezone=Etc/UTC block.events_dfl_poll_msecs=1000 noautologin module=Tails kaslr slab_nomerge slub_debug=FZP mce=0 vsyscall=none page_poison=1 union=aufs noapic noapm nodma nomce nolapic nomodeset nosmp 
+  
+  initrd (loop)/live/initrd.img
 }
 EOF
-  done
 done
 
 for i in systemrescuecd*.iso;do
