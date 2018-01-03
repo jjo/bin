@@ -5,7 +5,7 @@
 #
 # vim: si sw=2 ts=2 et
 shopt -s nullglob
-for i in ubuntu*.iso linuxmint*;do
+for i in *ubuntu*.iso linuxmint*.iso;do
   case "$i" in *amd64*) k=vmlinuz.efi;; *) k=vmlinuz;; esac
 cat <<EOF
 menuentry "$i" {
@@ -46,9 +46,17 @@ menuentry "$i $arch" {
   set isofile="/boot/iso/$i"
   echo "Using \${isofile} ..."
   loopback loop \${isofile}
-  linux (loop)/isolinux/rescue$arch isoloop=\${isofile} setkmap=us docache dostartx
+  linux (loop)/isolinux/rescue$arch isoloop=\${isofile} setkmap=us
   initrd (loop)/isolinux/initram.igz
 }
+menuentry "$i $arch (to ram)" {
+  set isofile="/boot/iso/$i"
+  echo "Using \${isofile} ..."
+  loopback loop \${isofile}
+  linux (loop)/isolinux/rescue$arch isoloop=\${isofile} setkmap=us docache
+  initrd (loop)/isolinux/initram.igz
+}
+
 EOF
   done
 done
@@ -58,9 +66,18 @@ for i in grml*.iso;do
 cat <<EOF
 menuentry "$i $arch" {
   set isofile="/boot/iso/$i"
+  set bootid="cce315de-e4f4-460c-8564-12ed50cec3e2"
   echo "Using \${isofile} ..."
   loopback loop \${isofile}
-  linux (loop)/boot/grml${arch}full/vmlinuz findiso=\${isofile} apm=power-off lang=us vga=791 boot=live nomce noeject noprompt --
+  linux (loop)/boot/grml${arch}full/vmlinuz apm=power-off boot=live findiso=\${isofile} nomce net.ifnames=0 live-media-path=/live/grml${arch}-full bootid=\${bootid}
+  initrd (loop)/boot/grml${arch}full/initrd.img
+}
+menuentry "$i $arch (to ram)" {
+  set isofile="/boot/iso/$i"
+  set bootid="cce315de-e4f4-460c-8564-12ed50cec3e2"
+  echo "Using \${isofile} ..."
+  loopback loop \${isofile}
+  linux (loop)/boot/grml${arch}full/vmlinuz apm=power-off boot=live findiso=\${isofile} nomce net.ifnames=0 live-media-path=/live/grml${arch}-full bootid=\${bootid} toram=grml${arch}-full.squashfs
   initrd (loop)/boot/grml${arch}full/initrd.img
 }
 EOF
