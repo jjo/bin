@@ -116,18 +116,41 @@ menuentry "$i (to ram)" {
 EOF
 done
 
+# cp /usr/lib/syslinux/memdisk memdisk.bzImage
+for i in sgdh*.iso super_grub2_disk*.iso; do
 cat <<EOF
+menuentry "$i" {
+  set isofile="/boot/iso/$i"
+  echo "Using \${isofile}..."
+  insmod part_gpt
+  insmod memdisk
+  search --set -f \${isofile}
+  linux16 /boot/iso/memdisk.bzImage iso bigraw
+  initrd16 \${isofile}
+}
+EOF
+done
+
+cat <<EOF
+menuentry "iPXE" {
+  set isofile="/boot/iso/ipxe.iso"
+  echo "Using \${isofile}..."
+  loopback loop \${isofile}
+  linux16 (loop)/IPXE.KRN
+}
 menuentry "netbootme.iso" {
-  loopback loop /boot/iso/netbootme.iso
+  set isofile="/boot/iso/netbootme.iso"
+  echo "Using \${isofile}..."
+  loopback loop \${isofile}
   linux16 (loop)/GPXE.KRN
 }
-
 menuentry "memtest.bin" {
-  linux16 /boot/img/memtest.bin
+  linux16 /boot/iso/memtest.bin
 }
-
 menuentry "Grub4DOS(grub.exe): Hiren BootCD" {
-        search -f --set=root /grub.exe
+  search -f --set=root /grub.exe
   linux /grub.exe
 }
 EOF
+
+# vim: et si sw=2 ts=2
