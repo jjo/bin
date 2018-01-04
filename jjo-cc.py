@@ -8,9 +8,9 @@ from jinja2 import Template
 POLONIEX_URL = "https://poloniex.com/public"
 POLONIEX_COINS = (
     "BTC BCH ZEC ETH DASH OMNI XMR "
-    "DGB DOGE POT LSK XRP").split()
+    "DGB DOGE POT LSK XRP ARDR").split()
 HITBTC_URL = "https://api.hitbtc.com/api/1/public/%sBTC/ticker"
-HITBTC_COINS = "TKN BTG".split()
+HITBTC_COINS = "TKN BTG TRX".split()
 
 
 def get_poloniex(coins):
