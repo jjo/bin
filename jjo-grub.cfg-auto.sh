@@ -9,6 +9,7 @@ shopt -s nullglob
 submenu_begin() { echo "submenu \"${1:?} >\" --class ${2:?} {" ;}
 submenu_end() { echo "}" ;}
 
+## ubuntu {
 submenu_begin Ubuntu ubuntu
 for i in *ubuntu*.iso linuxmint*.iso;do
   case "$i" in *amd64*) k=vmlinuz.efi;; *) k=vmlinuz;; esac
@@ -23,7 +24,9 @@ menuentry "$i" --class ubuntu {
 EOF
 done
 submenu_end
+## }
 
+## tails {
 submenu_begin Tails tails
 for i in tails*.iso;do
 cat <<EOF
@@ -44,7 +47,9 @@ menuentry "$i failsafe" --class tails {
 EOF
 done
 submenu_end
+## }
 
+## rescue {
 submenu_begin Rescue rescue
 for i in systemrescuecd*.iso;do
   for arch in 32 64;do
@@ -91,7 +96,9 @@ EOF
   done
 done
 submenu_end
+## }
 
+## clone_part {
 submenu_begin "Cloning and Part" clone_part
 for i in clone*.iso;do
 cat <<EOF
@@ -125,7 +132,40 @@ menuentry "$i (to ram)" {
 EOF
 done
 submenu_end
+## }
 
+## netboot {
+submenu_begin "Netboot" netboot
+test -f ipxe.iso && cat <<EOF
+menuentry "iPXE" --class netboot {
+  set isofile="/boot/iso/ipxe.iso"
+  echo "Using \${isofile}..."
+  loopback loop \${isofile}
+  linux16 (loop)/IPXE.KRN
+}
+EOF
+
+test -f netboot.xyz.iso && cat <<EOF
+menuentry "netboot.xyz multi-OS net installer" --class netboot {
+  set isofile="/boot/iso/netboot.xyz.iso"
+  echo "Using \${isofile}..."
+  loopback loop \${isofile}
+  linux16 (loop)/IPXE.KRN
+}
+EOF
+
+test -f netbootme.iso && cat <<EOF
+menuentry "netbootme.iso" --class netboot {
+  set isofile="/boot/iso/netbootme.iso"
+  echo "Using \${isofile}..."
+  loopback loop \${isofile}
+  linux16 (loop)/GPXE.KRN
+}
+EOF
+submenu_end
+## }
+
+## bootmgr {
 submenu_begin "Other Boot managers" bootmgr
 # cp /usr/lib/syslinux/memdisk memdisk.bzImage
 for i in sgdh*.iso super_grub2_disk*.iso; do
@@ -141,7 +181,6 @@ menuentry "Super Grub2 Disk $i" --class bootmgr {
 }
 EOF
 done
-
 # Meh I have USB sticks with diff layout for grub.exe
 test -f ../grub.exe -a -f ../grub/menu.lst && cat <<EOF
 menuentry "Grub4Dos" --class bootmgr {
@@ -176,27 +215,9 @@ menuentry "Syslinux" --class bootmgr {
 }
 EOF
 submenu_end
+## }
 
-submenu_begin "Net Boot" netboot
-test -f ipxe.iso && cat <<EOF
-menuentry "iPXE" --class netboot {
-  set isofile="/boot/iso/ipxe.iso"
-  echo "Using \${isofile}..."
-  loopback loop \${isofile}
-  linux16 (loop)/IPXE.KRN
-}
-EOF
-
-test -f netbootme.iso && cat <<EOF
-menuentry "netbootme.iso" --class netboot {
-  set isofile="/boot/iso/netbootme.iso"
-  echo "Using \${isofile}..."
-  loopback loop \${isofile}
-  linux16 (loop)/GPXE.KRN
-}
-EOF
-submenu_end
-
+## tools {
 submenu_begin "Misc tools" tools
 test -f memtest.bin && cat <<EOF
 menuentry "memtest.bin" --class tools {
@@ -239,5 +260,8 @@ menuentry "Reboot" --class tools {
 }
 EOF
 submenu_end
+## }
+
+# Local addition
 test -f grub.cfg.add && cat grub.cfg.add
 # vim: et si sw=2 ts=2
