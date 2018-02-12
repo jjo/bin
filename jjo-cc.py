@@ -13,13 +13,16 @@ import time
 
 # Q&D from several sources
 POLONIEX_URL = "https://poloniex.com/public"
-POLONIEX_COINS = (
-    "BTC BCH ZEC ETH DASH OMNI XMR "
-    "DGB DOGE POT LSK XRP ARDR OMG STR").split()
+POLONIEX_COINS = ("BTC BCH ZEC ETH XMR "
+                  "DGB DOGE POT XRP ARDR OMG").split()
 HITBTC_URL = "https://api.hitbtc.com/api/1/public/%sBTC/ticker"
 HITBTC_COINS = "TKN BTG TRX SBTC".split()
 BITTREX_URL = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 BITTREX_COINS = "QRL".split()
+BINANCE_URL = "https://api.binance.com/api/v1/ticker/24hr?symbol=%sBTC"
+BINANCE_COINS = "XLM IOTA BNB".split()
+
+COINS = POLONIEX_COINS + HITBTC_COINS + BITTREX_COINS + BINANCE_COINS
 
 
 def get_poloniex(coins):
@@ -33,7 +36,8 @@ def get_poloniex(coins):
 def get_hitbtc(coin):
     "Hitbtc requires one call per ticker (driven by asyncio below)"
     assert isinstance(coin, str)
-    entry = requests.get(HITBTC_URL % coin).json()
+    url = HITBTC_URL % coin
+    entry = requests.get(url).json()
     ticker = {"BTC_" + coin: {
         "last": entry["last"],
         "percentChange": "{:.8f}".format(
@@ -58,15 +62,32 @@ def get_bitrex(coins):
     return tickers
 
 
+def get_binance(coin):
+    "Binance requires one call per ticker (driven by asyncio below)"
+    assert isinstance(coin, str)
+    url = BINANCE_URL % coin
+    entry = requests.get(url).json()
+    ticker = {"BTC_" + coin: {
+        "last": entry["lastPrice"],
+        "percentChange": "{:.8f}".format(
+            float(entry["lastPrice"]) / (float(entry["openPrice"])) - 1),
+        "ref": "open",
+    }}
+    return ticker
+
+
 async def fetch():
     loop = asyncio.get_event_loop()
-    futures_poloniex = [
-        loop.run_in_executor(None, get_poloniex, POLONIEX_COINS)]
-    futures_hitbtc = [
-        loop.run_in_executor(None, get_hitbtc, coin) for coin in HITBTC_COINS]
-    futures_bitrex = [
-        loop.run_in_executor(None, get_bitrex, BITTREX_COINS)]
-    futures = futures_poloniex + futures_hitbtc + futures_bitrex
+    futures = [
+        loop.run_in_executor(None, get_poloniex, POLONIEX_COINS)
+    ] + [
+        loop.run_in_executor(None, get_hitbtc, coin) for coin in HITBTC_COINS
+    ] + [
+        loop.run_in_executor(None, get_bitrex, BITTREX_COINS)
+    ] + [
+        loop.run_in_executor(None, get_binance, coin) for coin in BINANCE_COINS
+    ]
+
     tickers = {}
     for response in await asyncio.gather(*futures):
         tickers.update(response)
@@ -105,8 +126,6 @@ def get_balance(filename, tickers):
 loop = asyncio.get_event_loop()
 tickers = loop.run_until_complete(fetch())
 
-COINS = POLONIEX_COINS + HITBTC_COINS + BITTREX_COINS
-
 for coin in COINS:
     usd_coin = "USDT_" + coin
     if usd_coin not in tickers.keys():
@@ -117,7 +136,6 @@ for coin in COINS:
             ),
             "percentChange": tickers["BTC_" + coin]["percentChange"],
         }
-
 
 COIN_CONV = [[{'name': t + x,
                'last': tickers[t + x]['last'],
