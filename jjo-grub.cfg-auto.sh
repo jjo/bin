@@ -12,14 +12,21 @@ submenu_end() { echo "}" ;}
 ## ubuntu {
 submenu_begin Ubuntu ubuntu
 for i in *ubuntu*.iso linuxmint*.iso;do
-  case "$i" in *amd64*) k=vmlinuz.efi;; *) k=vmlinuz;; esac
+  case "$i" in
+    *server*) initrd=initrd.gz; params="";;
+    *) initrd=initrd.lz; params="noeject noprompt";;
+  esac
+  case "$i" in
+    *18.04*) k=vmlinuz;;
+    *amd64*) k=vmlinuz.efi;;
+  esac
 cat <<EOF
 menuentry "$i" --class ubuntu {
   set isofile="/boot/iso/$i"
   echo "Using \${isofile} ..."
   loopback loop \${isofile}
-  linux (loop)/casper/$k boot=casper iso-scan/filename=\${isofile} noeject noprompt --
-  initrd (loop)/casper/initrd.lz
+  linux (loop)/casper/$k boot=casper iso-scan/filename=\${isofile} ${params} --
+  initrd (loop)/casper/$initrd
 }
 EOF
 done
