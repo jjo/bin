@@ -1,3 +1,4 @@
+#!/bin/bash
 #set -x
 #permanent in gnome:
 setup_gconf() {

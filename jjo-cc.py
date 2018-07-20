@@ -102,7 +102,7 @@ def get_balance(filename, tickers):
     with open(filename, 'rt') as f:
         reader = csv.reader(f, delimiter='\t')
         for row in reader:
-            if row != []:
+            if row != [] and row[0][0] != '#':
                 d[row[0]].update({row[1]: row[2]})
 
     all_total = 0.0
