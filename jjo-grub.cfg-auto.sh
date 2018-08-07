@@ -33,6 +33,31 @@ done
 submenu_end
 ## }
 
+## rancheros {
+submenu_begin RancherOS rancheros
+for i in rancheros*.iso; do
+vmlinuz=$(isoinfo -f -R -i rancheros.iso |egrep /boot/vmlinuz)
+initrd=$(isoinfo -f -R -i rancheros.iso |egrep /boot/initrd)
+: ${vmlinuz:?} ${initrd:?}
+cat <<EOF
+menuentry "$i" --class rancheros {
+  set isofile="/boot/iso/$i"
+  echo "Using \${isofile} ..."
+  loopback loop \${isofile}
+  linux (loop)${vmlinuz} initrd=${initrd} rancher.autologin=tty1 rancher.autologin=ttyS0 rancher.autologin=ttyS1 rancher.autologin=ttyS1 console=tty1 console=ttyS0 console=ttyS1 printk.devkmsg=on
+  initrd (loop)${initrd}
+}
+#   map --mem \${isofile}
+#   map (hd0) (hd1)
+#   map (hd1) (hd0)
+#   map --hook
+#   root (hd32)
+#   chainloader (hd32)
+EOF
+done
+submenu_end
+## }
+
 ## tails {
 submenu_begin Tails tails
 for i in tails*.iso;do
