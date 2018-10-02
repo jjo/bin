@@ -14,11 +14,11 @@ import time
 # Q&D from several sources
 POLONIEX_URL = "https://poloniex.com/public"
 POLONIEX_COINS = ("BTC BCH ZEC ETH XMR "
-                  "DGB DOGE POT XRP ARDR OMG").split()
+                  "DGB DOGE XRP ARDR OMG").split()
 HITBTC_URL = "https://api.hitbtc.com/api/1/public/%sBTC/ticker"
 HITBTC_COINS = "TKN BTG TRX SBTC".split()
 BITTREX_URL = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
-BITTREX_COINS = "QRL".split()
+BITTREX_COINS = "QRL POT".split()
 BINANCE_URL = "https://api.binance.com/api/v1/ticker/24hr?symbol=%sBTC"
 BINANCE_COINS = "XLM IOTA BNB".split()
 
