@@ -23,7 +23,7 @@ OUT_RES1=${OUT_DEV_RES[1]}
 OUT_DEV2=${OUT_DEV_RES[2]}
 OUT_RES2=${OUT_DEV_RES[3]}
 LCD_DEV=${LCD_DEV_RES[0]}
-LCD_RES=${LCD_DEV_RES[1]}
+LCD_RES=${LCD_RES:-${LCD_DEV_RES[1]}} # allow eg LCD_DEV=1368x768 monitor.sh ...
 : ${LCD_DEV:?} ${LCD_RES:?}
 
 case "$1" in
