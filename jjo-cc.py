@@ -13,14 +13,14 @@ import time
 
 # Q&D from several sources
 POLONIEX_URL = "https://poloniex.com/public"
-POLONIEX_COINS = ("BTC BCH ZEC ETH XMR "
+POLONIEX_COINS = ("BTC ZEC ETH XMR "
                   "DGB DOGE XRP BCHABC BCHSV").split()
 HITBTC_URL = "https://api.hitbtc.com/api/1/public/%sBTC/ticker"
 HITBTC_COINS = "BTG TRX SBTC".split()
 BITTREX_URL = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
-BITTREX_COINS = []
+BITTREX_COINS = "BCH".split()
 BINANCE_URL = "https://api.binance.com/api/v1/ticker/24hr?symbol=%sBTC"
-BINANCE_COINS = "XLM IOTA BNB EOS".split()
+BINANCE_COINS = "XLM IOTA BNB EOS OMG".split()
 
 COINS = POLONIEX_COINS + HITBTC_COINS + BITTREX_COINS + BINANCE_COINS
 
@@ -29,6 +29,8 @@ def get_poloniex(coins):
     "Poloniex returns all tickers in a single call"
     assert isinstance(coins, list)
     r = requests.get(POLONIEX_URL, params={'command': 'returnTicker'})
+    if (r.status_code != 200):
+        raise Exception("'{}' failed with {}".format(r.url, r.status_code))
     tickers = r.json()
     return tickers
 
@@ -37,7 +39,10 @@ def get_hitbtc(coin):
     "Hitbtc requires one call per ticker (driven by asyncio below)"
     assert isinstance(coin, str)
     url = HITBTC_URL % coin
-    entry = requests.get(url).json()
+    r = requests.get(url)
+    if (r.status_code != 200):
+        raise Exception("'{}' failed with {}".format(r.url, r.status_code))
+    entry=r.json()
     ticker = {"BTC_" + coin: {
         "last": entry["last"],
         "percentChange": "{:.8f}".format(
@@ -50,6 +55,8 @@ def get_hitbtc(coin):
 def get_bitrex(coins):
     assert isinstance(coins, list)
     r = requests.get(BITTREX_URL)
+    if (r.status_code != 200):
+        raise Exception("'{}' failed with {}".format(r.url, r.status_code))
     tickers = {}
     for ticker in r.json()["result"]:
         market_name = ticker["MarketName"].replace("-", "_")
@@ -66,7 +73,10 @@ def get_binance(coin):
     "Binance requires one call per ticker (driven by asyncio below)"
     assert isinstance(coin, str)
     url = BINANCE_URL % coin
-    entry = requests.get(url).json()
+    r = requests.get(url)
+    if (r.status_code != 200):
+        raise Exception("'{}' failed with {}".format(r.url, r.status_code))
+    entry=r.json()
     ticker = {"BTC_" + coin: {
         "last": entry["lastPrice"],
         "percentChange": "{:.8f}".format(
