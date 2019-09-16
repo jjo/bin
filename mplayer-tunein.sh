@@ -111,7 +111,8 @@ esac
 
 CMD="mplayer $MPLAYER_CACHE"
 if [ -n "$SAVE" ]; then
-    CMD="ffmpeg -c copy $SAVE -i"
+    #CMD="ffmpeg -c copy $SAVE -i"
+    CMD="mplayer -dumpstream -dumpfile $SAVE"
 fi
 [ -n "$VERBOSE" ] && set -x
 URL=$($cache_func tunein_search "${search:?}") || exit 1
