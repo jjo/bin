@@ -108,11 +108,10 @@ case "$0" in
     *)  exit 1;;
 esac
 
-
-CMD="mplayer $MPLAYER_CACHE"
+CMD="mplayer -prefer-ipv4 $MPLAYER_CACHE"
 if [ -n "$SAVE" ]; then
     #CMD="ffmpeg -c copy $SAVE -i"
-    CMD="mplayer -dumpstream -dumpfile $SAVE"
+    CMD="mplayer -prefer-ipv4 -dumpstream -dumpfile $SAVE"
 fi
 [ -n "$VERBOSE" ] && set -x
 URL=$($cache_func tunein_search "${search:?}") || exit 1
