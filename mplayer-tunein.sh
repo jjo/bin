@@ -15,18 +15,67 @@ cache() {
     fi
     return 0
 }
+# Thanks xndc for
+# https://gist.githubusercontent.com/xndc/c732204e274743204f1f/raw/c03eb16f7ed5088732dde85c3f2d2162b52b78cd/tunejack.sh !
+# Cherry picking bits:
+# Helper function for encoding a URL.
+# See http://stackoverflow.com/questions/296536/
+urlencode() {
+    local string="$*"
+    local strlen=${#string}
+    local encoded=""
+
+    for (( pos=0 ; pos<strlen ; pos++ )); do
+        c=${string:$pos:1}
+        case "$c" in
+            [-_.~a-zA-Z0-9] ) o="${c}" ;;
+            * )               printf -v o '%%%02x' "'$c"
+        esac
+        encoded+="${o}"
+    done
+    echo "${encoded}"
+}
+# Main tunejack.sh (adapted) logic
+tunejack() {
+    local pattern=${*:?}
+    local API_RESPONSE API_RESULT_TAG API_URL
+    API_RESPONSE=$(curl -s "http://opml.radiotime.com/Search.ashx?query=$(urlencode $pattern)")
+    # Try to grab the first <outline> element from the response.
+    # It has to have attributes type="audio" and item="station".
+    # Discard results containing key="unavailable" - they're useless stubs.
+    API_RESULT_TAG=$(echo "$API_RESPONSE" \
+        | grep '<outline type="audio"' \
+        | grep 'item="station"' \
+        | grep -v 'key="unavailable"' \
+        | head -n 1)
+    API_RESULT_TAG=$(echo "$API_RESULT_TAG" | sed 's/" /"\n/g')
+    # Helper function to extract a tag.
+    # The sed is because we're not actually decoding XML, and things like
+    # apostrophes are represented by HTML entities like &apos;.
+    extract_tag() {
+        TAG="${1}"
+        echo "$API_RESULT_TAG" | grep "^$TAG=" | cut -d '"' -f 2 \
+            | sed "s/&apos;/\'/g"
+    }
+    # Display the details we're interested in - name, subtext, URL.
+    echo "$(extract_tag text)" >&2
+    echo "$(extract_tag subtext)" >&2
+    echo "$(extract_tag URL)" >&2
+    # Throw the URL in a variable for later purposes.
+    API_URL="$(extract_tag URL)"
+    echo "${API_URL}"
+}
 tunein_search() {
-   local query=${*:?} streamurl
-   query="${query// /+}"
-   if [ -f ~/etc/radiocache.d/${query} ]; then
-       streamurl=$(cat ~/etc/radiocache.d/${query})
-   else
-       local tunein_search_result=$(curl -s "http://tunein.com/search/?query=$query"|egrep -o '/radio/[^"]+-s[^"]+'|sort|uniq)
-       local tunein_url=http://tunein.com/${tunein_search_result:?}
-       streamurl=$(curl -s $(curl -s ${tunein_url:?} |sed -rn 's/.*StreamUrl.:.([^"]+)".*/http:\1/p')|jq -r '.Streams[0].Url')
-   fi
-   echo "*** streamurl=${streamurl:?}" >&2
-   echo ${streamurl}
+    local query=${*:?} streamurl api_url
+    query="${query// /+}"
+    if [ -f ~/etc/radiocache.d/${query} ]; then
+        streamurl=$(cat ~/etc/radiocache.d/${query})
+    else
+        api_url=$(tunejack ${query})
+        streamurl=$(curl -s "${api_url}")
+    fi
+    echo "*** streamurl=${streamurl:?}" >&2
+    echo ${streamurl}
 }
 
 OPTS=$(getopt -o vnc:s: --long verbose,no-urlcache,cache:,save: -n 'mplayer-tunein' -- "$@") || exit 1
@@ -36,13 +85,13 @@ SAVE=""
 VERBOSE=""
 MPLAYER_CACHE=""
 while true; do
-   case "$1" in
-       -v | --verbose) VERBOSE=1; shift;;
-       -n | --no-urlcache) cache_func=""; shift;;
-       -s | --save) SAVE="$2"; shift 2;;
-       -c | --cache) MPLAYER_CACHE="-cache $2 -cache-min 90"; shift 2;;
-       --) shift; break;;
-       *) break;;
+    case "$1" in
+        -v | --verbose) VERBOSE=1; shift;;
+        -n | --no-urlcache) cache_func=""; shift;;
+        -s | --save) SAVE="$2"; shift 2;;
+        -c | --cache) MPLAYER_CACHE="-cache $2 -cache-min 90"; shift 2;;
+        --) shift; break;;
+        *) break;;
     esac
 done
 
