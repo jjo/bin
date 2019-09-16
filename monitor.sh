@@ -15,7 +15,7 @@ usage() {
 test $# -gt 0 || usage
 
 typeset -a LCD_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(LVDS[0-9]|eDP-?[0-9]) conn'| awk '{ print $1 }'))
-typeset -a OUT_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(VGA|DP|HDMI)-?[0-9] conn'| awk '/^[^-]/{ print $1 }'))
+typeset -a OUT_DEV_RES=($(/usr/bin/xrandr -q|egrep -A1 '^(VGA|DP|HDMI)-[0-9](-[0-9])? conn'| awk '/^[^-]/{ print $1 }'))
 PRES_MODE=1024x768
 #PRES_MODE=1920x1080
 OUT_DEV1=${OUT_DEV_RES[0]}
