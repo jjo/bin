@@ -51,7 +51,7 @@ while read schema key value;do
 	[[ $schema =~ \#.* ]] && continue
 	(set -x;gsettings set $schema $key "$value")
 done <<EOF
-org.gnome.settings-daemon.plugins.media-keys screensaver 'Pause'
+org.gnome.settings-daemon.plugins.media-keys screensaver ['Pause']
 org.gnome.libgnomekbd.keyboard options @as ['ctrl:nocaps', 'ctrltctrl:nocaps', 'ctrl	ctrl:nocaps', 'grp	grp:shifts_toggle']
 #org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl', 'us	intl', 'us', 'es']
 org.gnome.libgnomekbd.keyboard layouts @as ['us	altgr-intl']
