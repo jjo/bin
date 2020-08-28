@@ -1,0 +1,5 @@
+#!/bin/bash
+X_ENV=""
+# For all envvars starting with AWS_, prep the cli with `-e AWS_foo=`value
+for var in ${!AWS_*}; do X_ENV="-e ${var}=${X_ENV}${!var} " ;done
+exec docker run --rm -i -u $(id -u):$(id -g) -v ~/.aws:${HOME}/.aws:ro -e HOME=${HOME} ${X_ENV} -v $(pwd):/aws amazon/aws-cli "$@"

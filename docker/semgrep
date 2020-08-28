@@ -1,0 +1,3 @@
+#!/bin/bash -x
+IMAGE=returntocorp/semgrep
+docker run -it -u $(id -u) --rm -v ${HOME}:${HOME} -v ${PWD}:/home/repo -w ${PWD} ${IMAGE} "${@}"
