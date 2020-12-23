@@ -31,8 +31,8 @@ case "$1" in
 esac
 wot="$1"
 shift; test -n "$1" && LCD_RES="$1"
-shift; test -n "$1" && OUT_RES1="$2"
-shift; test -n "$1" && OUT_RES2="$3"
+shift; test -n "$1" && OUT_RES1="$1"
+shift; test -n "$1" && OUT_RES2="$1"
 echo "# LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV1?}@${OUT_RES1?} ${OUT_DEV2:+${OUT_DEV2}@${OUT_RES2}}"
 case "$wot" in
     solo)    #%usage LCD display only
@@ -94,10 +94,10 @@ case "$wot" in
         : ${OUT_DEV2:?} ${OUT_RES2:?}
         [[ $LCD_DEV =~ eDP-?[0-9] ]] || \
             xrandr --output $LCD_DEV --off
-            xrandr --output $OUT_DEV2 --primary --rotate normal --auto
+            xrandr --output $OUT_DEV2 --primary --mode $OUT_RES2 --rotate normal --auto
         [[ $LCD_DEV =~ eDP-?[0-9] ]] && \
             xrandr --output $LCD_DEV --below $OUT_DEV2 --mode $LCD_RES --rotate normal --auto
-            xrandr --output $OUT_DEV1 --right-of $OUT_DEV2 --rotate normal --auto
+            xrandr --output $OUT_DEV1 --right-of $OUT_DEV2 --mode $OUT_RES1 --rotate normal --auto
         ;;
     *)
         usage

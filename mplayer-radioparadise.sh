@@ -12,4 +12,4 @@ done
 # Particular case :/ ->
 [ ${stream}${qual} = "aac-flac" ] && stream=""
 set -x
-mplayer -prefer-ipv4 -cache 256 "$@" http://stream.radioparadise.com/${stream}${qual}
+exec mplayer -prefer-ipv4 -cache 256 "$@" http://stream.radioparadise.com/${stream}${qual}

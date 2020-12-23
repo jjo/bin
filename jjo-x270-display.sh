@@ -9,7 +9,8 @@ case "$1" in
         ~/bin/monitor.sh solo 1360x768
         ;;
 	desk)
-        ~/bin/monitor.sh h3v2 1360x768
+        #~/bin/monitor.sh h3v2 #1360x768
+        ~/bin/monitor.sh h3h2 1920x1080 1920x1080 2560x1440 #1360x768
         ;;
 	*) ~/bin/monitor.sh ${1:?} 1360x768;;
 esac

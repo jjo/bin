@@ -51,10 +51,10 @@ CEDEARS=$(CEDEARS_tsv)
 # Tab-separated output "joining" some CEDEARS_URL fields with Zacks rank
 # NOTE: uses `q` tool (from "python3-q-text-as-data" pip / pkg) to query the tsv as SQL
 (
-echo -e "Stock\tZRank\tD_CCL%\tARS_tot\tRatio\tUSD_d%\tARS_d%"
+echo -e "Stock\tZRank\tD_CCL%\tARS_tot\tRatio\tARS_val\tUSD_d%\tARS_d%"
 while read stock rest; do
     echo -en "${stock}\t"
     echo -en "$(zacks_query ${stock})\t"
     echo -e "${rest}"
-done < <(echo "${CEDEARS}" | q -t -H "select Stock,Delta_CCL_ref,ARS_value*Ratio,Ratio,USD_day_pct,ARS_day_pct from - $FILTER $ORDER")
+done < <(echo "${CEDEARS}" | q -t -H "select Stock,Delta_CCL_ref,CAST(ARS_value*Ratio AS INT),Ratio,CAST(ARS_value AS INT),USD_day_pct,ARS_day_pct from - $FILTER $ORDER")
 )
