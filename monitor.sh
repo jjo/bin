@@ -22,6 +22,8 @@ OUT_DEV1=${OUT_DEV_RES[0]}
 OUT_RES1=${OUT_DEV_RES[1]}
 OUT_DEV2=${OUT_DEV_RES[2]}
 OUT_RES2=${OUT_DEV_RES[3]}
+OUT_DEV3=${OUT_DEV_RES[4]}
+OUT_RES3=${OUT_DEV_RES[5]}
 LCD_DEV=${LCD_DEV_RES[0]}
 LCD_RES=${LCD_RES:-${LCD_DEV_RES[1]}} # allow eg LCD_DEV=1368x768 monitor.sh ...
 : ${LCD_DEV:?} ${LCD_RES:?}
@@ -33,6 +35,7 @@ wot="$1"
 shift; test -n "$1" && LCD_RES="$1"
 shift; test -n "$1" && OUT_RES1="$1"
 shift; test -n "$1" && OUT_RES2="$1"
+shift; test -n "$1" && OUT_RES3="$1"
 echo "# LCD:${LCD_DEV?}@${LCD_RES?} OUT:${OUT_DEV1?}@${OUT_RES1?} ${OUT_DEV2:+${OUT_DEV2}@${OUT_RES2}}"
 case "$wot" in
     solo)    #%usage LCD display only
@@ -84,20 +87,30 @@ case "$wot" in
         : ${OUT_DEV2:?} ${OUT_RES2:?}
         [[ $LCD_DEV =~ eDP-?[0-9] ]] || \
             xrandr --output $LCD_DEV --off
-            xrandr --output $OUT_DEV1 --primary --rotate normal --auto
+            xrandr --output $OUT_DEV1 --mode $OUT_RES1 --primary --rotate normal --auto
         [[ $LCD_DEV =~ eDP-?[0-9] ]] && \
             xrandr --output $LCD_DEV --below $OUT_DEV1 --mode $LCD_RES --rotate normal --auto
-            xrandr --output $OUT_DEV2 --right-of $OUT_DEV1 --rotate normal --auto
+            xrandr --output $OUT_DEV2 --mode $OUT_RES2 --right-of $OUT_DEV1 --rotate normal --auto
         ;;
     h3h2)   #%usage Dual Horiz(left) Horiz(right)
         : ${OUT_DEV1:?} ${OUT_RES1:?}
         : ${OUT_DEV2:?} ${OUT_RES2:?}
+        xrandr --output $LCD_DEV --auto
         [[ $LCD_DEV =~ eDP-?[0-9] ]] || \
             xrandr --output $LCD_DEV --off
             xrandr --output $OUT_DEV2 --primary --mode $OUT_RES2 --rotate normal --auto
         [[ $LCD_DEV =~ eDP-?[0-9] ]] && \
             xrandr --output $LCD_DEV --below $OUT_DEV2 --mode $LCD_RES --rotate normal --auto
             xrandr --output $OUT_DEV1 --right-of $OUT_DEV2 --mode $OUT_RES1 --rotate normal --auto
+        ;;
+    h1h3h2)   #%usage 3x horiz
+        : ${OUT_DEV1:?} ${OUT_RES1:?}
+        : ${OUT_DEV2:?} ${OUT_RES2:?}
+        : ${OUT_DEV3:?} ${OUT_RES3:?}
+        xrandr --output $LCD_DEV --off
+        xrandr --output $OUT_DEV2 --mode $OUT_RES2 --rotate normal --auto --primary
+        xrandr --output $OUT_DEV1 --mode $OUT_RES1 --left-of $OUT_DEV2 --rotate normal --auto
+        xrandr --output $OUT_DEV3 --mode $OUT_RES3 --right-of $OUT_DEV2 --rotate normal --auto
         ;;
     *)
         usage
