@@ -45,6 +45,7 @@ xrandr --output ${output} --off"
         ON_OFF="--auto"
         case "$spec" in
             */off*) ON_OFF=--off;;
+            *) check ${output} || return 1;;
         esac
         ROTATE="--rotate normal"
         case "$spec" in
@@ -95,12 +96,12 @@ init_RESOL_DB
 [[ $1 == -n ]] && RUN="cat" && shift
 case "$1" in
     desk)  #%usage 3-horizontal DP-1 -> DP-2-1 -> DP-2-2
-        check DP-1 && spec_to_xrandr DP-1 DP-2-1/pri@${RES_2K} DP-2-2;;
+        spec_to_xrandr DP-1 DP-2-1/pri@${RES_2K} DP-2-2;;
     deskl) #%usage DP-2-1 center, eDP-1 below, DP-2-2 right
-        check eDP-1 && spec_to_xrandr eDP-1 DP-2-1/pri/ao@${RES_2K} DP-2-2;;
+        spec_to_xrandr eDP-1 DP-2-1/pri/ao@${RES_2K} DP-2-2;;
     solo)  #%usage laptop only
-        check eDP-1 && spec_to_xrandr eDP-1;;
+        spec_to_xrandr eDP-1;;
     solo@low) #%usage laptop only, lowres
-        check eDP-1 && spec_to_xrandr eDP-1@${RES_LOW};;
+        spec_to_xrandr eDP-1@${RES_LOW};;
     *) usage;;
 esac
