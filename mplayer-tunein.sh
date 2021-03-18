@@ -117,4 +117,4 @@ fi
 URL=$($cache_func tunein_search "${search:?}") || exit 1
 : ${URL:?}
 set -x
-exec $CMD $URL
+exec $CMD $URL "${@}"
