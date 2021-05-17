@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 cache() {
     local cmdline="$*"
     local dir="$HOME/.cache/mplayer-tunein"
