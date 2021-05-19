@@ -12,6 +12,6 @@ echo SAVE=$SAVE
 URI=https://latamstreaming-live-os.akamaized.net/live_passthrough/ammdz/chunks.m3u8
 
 case "$SAVE" in
-    "") echo vlc -I ncurses "${URI}";;
+    "") vlc -I ncurses "${URI}";;
     *)  vlc -I dummy --sout="file/ogg:${SAVE}" "${URI}";;
 esac
