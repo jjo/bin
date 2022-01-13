@@ -33,6 +33,6 @@ for file in `ls -1 /sys/class/drm/*/edid`; do
 done
 echo "LEFT=${LEFT:?} MAIN=${MAIN:?} RIGHT=${RIGHT:?} BUILTIN=${BUILTIN:?}"
 set -x
-# Workaround Dell D6000 Dock HDMI output to LEFT monitor: "Did you try turning off/on again ?"
+# Workaround Dell D6000 Dock HDMI output to LEFT monitor sending it to sleep -> "Did you try turning off/on again ?"
 xrandr --output $LEFT --off; xrandr --output $LEFT --auto
 xrandr --output $MAIN --mode $MAIN_MODE --primary --output $LEFT --left-of $MAIN --output $BUILTIN --below $MAIN --output $RIGHT --right-of $MAIN
