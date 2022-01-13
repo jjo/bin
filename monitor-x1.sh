@@ -10,26 +10,41 @@
 #        BUILTIN
 #
 
-MAIN_MODE=2560x1440 # Can't read with 4K :/
-for file in `ls -1 /sys/class/drm/*/edid`; do
-	text=$(tr -d '\0' <"$file")
-	if [ -n "$text" ]; then
-		EDID=$(edid-decode "$file")
+MAIN_MODE=2560x1440        # Can't read with native 4K :/
+LEFT_MATCH=RXP1N7890TNL    # Dell 24" S/N
+MAIN_MATCH=H4ZN900103      # Samsung 31" S/N
+RIGHT_MATCH=R9F1P45O9M0L   # Dell 24" S/N
+BUILTIN_MATCH="Manufacturer:?AUO"  # X1 Gen9 builtin display (no S/N, match by Manufacturer)
+
+
+test -f /usr/bin/edid-decode || {
+    echo "ERROR: needs edid-decode installed"
+}
+
+[ $(grep ^connected /sys/class/drm/card*/*/status|wc -l) == 4 ] || {
+    echo "NOTE: $0: SKIP, didn't detect FOUR connected monitors"
+    exit 0
+}
+
+for file in $(ls -1 /sys/class/drm/*/edid); do
+    text=$(tr -d '\0' <"$file")
+    test -n "$text" && {
+        EDID=$(edid-decode "$file")
         # Remove `cardN-` prefix and `/edid` postfix
-		device=${file#/sys/class/drm/card*-}
-		device=${device%/edid}
+        device=${file#/sys/class/drm/card*-}
+        device=${device%/edid}
         # Fix: sys/class device appears as e.g. `DVI-I-1` while xrandr uses `DVI-I-1-1`
         device=$(xrandr -q | grep -oE "^${device}\S*")
         echo "device=${device}"
         echo "${EDID}" | grep -e Manufacturer: -e Serial.Number:
         # Map monitor S/N (or Manufacturer for builtin) to `xrandr` device
         case "${EDID}" in
-            *RXP1N7890TNL*) LEFT=${device};;  # Dell 24"
-            *H4ZN900103*)   MAIN=${device};;  # Samsung 31"
-            *R9F1P45O9M0L*) RIGHT=${device};; # Dell 24"
-            *Manufacturer:?AUO*) BUILTIN=${device};; # X1 Gen9 display
+            *${LEFT_MATCH}*)    LEFT=${device};;
+            *${MAIN_MATCH}*)    MAIN=${device};;
+            *${RIGHT_MATCH}*)   RIGHT=${device};;
+            *${BUILTIN_MATCH}*) BUILTIN=${device};;
         esac
-	fi
+    }
 done
 echo "LEFT=${LEFT:?} MAIN=${MAIN:?} RIGHT=${RIGHT:?} BUILTIN=${BUILTIN:?}"
 set -x
