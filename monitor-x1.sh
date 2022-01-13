@@ -22,8 +22,8 @@ test -f /usr/bin/edid-decode || {
 }
 
 [ $(grep ^connected /sys/class/drm/card*/*/status|wc -l) == 4 ] || {
-    echo "NOTE: $0: SKIP, didn't detect FOUR connected monitors"
-    exit 0
+    echo "NOTE: $0: didn't detect FOUR connected monitors"
+    #exit 0
 }
 
 for file in $(ls -1 /sys/class/drm/*/edid); do
