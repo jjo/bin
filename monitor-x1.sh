@@ -49,5 +49,7 @@ done
 echo "LEFT=${LEFT:?} MAIN=${MAIN:?} RIGHT=${RIGHT:?} BUILTIN=${BUILTIN:?}"
 set -x
 # Workaround Dell D6000 Dock HDMI output to LEFT monitor sending it to sleep -> "Did you try turning off/on again ?"
-xrandr --output $LEFT --off; xrandr --output $LEFT --auto
+# - sometimes also needed to kick BUILTIN
+xrandr --output $LEFT --off --output $BUILTIN --off
+xrandr --output $BUILTIN --auto --output $LEFT --auto
 xrandr --output $MAIN --mode $MAIN_MODE --primary --output $LEFT --left-of $MAIN --output $BUILTIN --below $MAIN --output $RIGHT --right-of $MAIN
