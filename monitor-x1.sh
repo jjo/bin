@@ -16,6 +16,11 @@ MAIN_MATCH=H4ZN900103      # Samsung 31" S/N
 RIGHT_MATCH=R9F1P45O9M0L   # Dell 24" S/N
 BUILTIN_MATCH="Manufacturer:?AUO"  # X1 Gen9 builtin display (no S/N, match by Manufacturer)
 
+MAIN_X="-r 60"
+LEFT_X="-r 60"
+RIGHT_X="-r 60"
+BUILTIN_X="" # "--scale 0.95x0.95"
+
 
 test -f /usr/bin/edid-decode || {
     echo "ERROR: needs edid-decode installed"
@@ -50,6 +55,10 @@ echo "LEFT=${LEFT:?} MAIN=${MAIN:?} RIGHT=${RIGHT:?} BUILTIN=${BUILTIN:?}"
 set -x
 # Workaround Dell D6000 Dock HDMI output to LEFT monitor sending it to sleep -> "Did you try turning off/on again ?"
 # - sometimes also needed to kick BUILTIN
-xrandr --output $LEFT --off --output $BUILTIN --off
-xrandr --output $BUILTIN --auto --output $LEFT --auto
-xrandr --output $MAIN --mode $MAIN_MODE --primary --output $LEFT --left-of $MAIN --output $BUILTIN --below $MAIN --output $RIGHT --right-of $MAIN
+xrandr --output ${LEFT} --off --output ${BUILTIN} --off --output ${RIGHT} --off
+xrandr --output ${BUILTIN} --auto --output ${LEFT} --auto --output ${RIGHT} --auto
+xrandr --output ${MAIN} --mode ${MAIN_MODE} --primary ${MAIN_X} \
+    --output ${LEFT} --left-of ${MAIN} ${LEFT_X} \
+    --output ${BUILTIN} --below ${MAIN} ${BUILTIN_X} \
+    --output ${RIGHT} --right-of ${MAIN} ${RIGHT_X}
+~/bin/jjo-xsettings.sh >& /dev/null
