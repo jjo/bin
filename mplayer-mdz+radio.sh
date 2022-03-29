@@ -13,5 +13,5 @@ URI=https://latamstreaming-live-os.akamaized.net/live_passthrough_static/ammdz/p
 
 case "$SAVE" in
     "") exec vlc -I ncurses "${URI}";;
-    *)  exec vlc -I dummy --sout="file/ogg:${SAVE}" "${URI}";;
+    *)  for i in {01..99};do sleep 0.1 || break; vlc -I dummy --sout="file/ogg:${SAVE%.ogg}-${i}.ogg" "${URI}"; done;;
 esac
