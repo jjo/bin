@@ -9,7 +9,8 @@ while true; do
 done
 
 echo SAVE=$SAVE
-URI=https://latamstreaming-live-os.akamaized.net/live_passthrough_static/ammdz/playlist.m3u8
+#URI=https://latamstreaming-live-os.akamaized.net/live_passthrough_static/ammdz/playlist.m3u8
+URI=http://lino.lsdlive.com/mdz.mp3
 
 case "$SAVE" in
     "") exec vlc -I ncurses "${URI}";;

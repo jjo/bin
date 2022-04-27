@@ -14,16 +14,17 @@ MAIN_MODE=2560x1440        # Can't read with native 4K :/
 LEFT_MATCH=RXP1N7890TNL    # Dell 24" S/N
 MAIN_MATCH=H4ZN900103      # Samsung 31" S/N
 RIGHT_MATCH=R9F1P45O9M0L   # Dell 24" S/N
-BUILTIN_MATCH="Manufacturer:?AUO"  # X1 Gen9 builtin display (no S/N, match by Manufacturer)
+BUILTIN_MATCH="Manufacturer:?BOE"  # X1 Gen9 builtin display (no S/N, match by Manufacturer)
 
-MAIN_X="-r 60"
-LEFT_X="-r 60"
-RIGHT_X="-r 60"
+MAIN_X="-r 50"
+LEFT_X="-r 50"
+RIGHT_X="-r 50"
 BUILTIN_X="" # "--scale 0.95x0.95"
 
 
 test -f /usr/bin/edid-decode || {
     echo "ERROR: needs edid-decode installed"
+    exit 1
 }
 
 [ $(grep ^connected /sys/class/drm/card*/*/status|wc -l) == 4 ] || {
