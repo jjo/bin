@@ -64,7 +64,7 @@ tunejack() {
         #echo "$(extract_tag "$line" URL)" >&2
         #echo "$(extract_tag "$line" text)" >&2
         #echo "$(extract_tag "$line" subtext)" >&2
-        LIST[$n]="$(extract_tag "$line" URL) - $(extract_tag "$line" text) $(extract_tag "$line" subtext)"
+        LIST[$n]="$(extract_tag "$line" URL) 	- $(extract_tag "$line" text) $(extract_tag "$line" subtext)"
         ((n++))
     done <<< "${API_RESULT_TAG:?}"
     #printf "%s\n" "${LIST[@]}" >&2
