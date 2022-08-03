@@ -13,8 +13,8 @@ echo SAVE=$SAVE
 URI=http://lino.lsdlive.com/mdz.mp3
 
 case $(uname -s) in
-    Darwin) PLAYER="vlc -I ncurses";;
-    *) PLAYER="mplayer -prefer-ipv4";;
+    Darwin) PLAYER="vlc -I ncurses ${@}";;
+    *) PLAYER="mplayer -prefer-ipv4 ${@}";;
 esac
 case "$SAVE" in
     "") exec ${PLAYER} "${URI}";;

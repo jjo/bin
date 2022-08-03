@@ -2,15 +2,15 @@
 cache() {
     local cmdline="$*"
     local dir="$HOME/.cache/mplayer-tunein"
-    local key="${cmdline// /_}"
+    local key="$(echo ${cmdline}|md5sum | sed 's/ .*//')"
     local cachefile="${dir}/cache-${key}"
     mkdir -p ${dir}
     # GC w/1day TTL:
     find ${dir:?}  -name 'cache-*' -mtime +1 -delete
     if [ -s ${cachefile} ] ;then
-        cat "${cachefile}"
+        sed 1d "${cachefile}"
     else
-        ${cmdline} | tee "${cachefile}"
+        (echo "#cmdline=${cmdline}"; ${cmdline}) | tee "${cachefile}"
         [ ${PIPESTATUS[0]} -eq 0 ] || { rm -f "${cachefile}"; return 1 ;}
     fi
     return 0
@@ -36,10 +36,11 @@ urlencode() {
     echo "${encoded}"
 }
 # Main tunejack.sh (adapted) logic
+typeset -A LIST
 tunejack() {
     local pattern=${*:?}
     local API_RESPONSE API_RESULT_TAG API_URL
-    API_RESPONSE=$(curl -s "http://opml.radiotime.com/Search.ashx?query=$(urlencode $pattern)")
+    API_RESPONSE=$($cache_func curl -s "http://opml.radiotime.com/Search.ashx?query=$(urlencode $pattern)")
     # Try to grab the first <outline> element from the response.
     # It has to have attributes type="audio" and item="station".
     # Discard results containing key="unavailable" - they're useless stubs.
@@ -47,33 +48,42 @@ tunejack() {
         | grep '<outline type="audio"' \
         | grep 'item="station"' \
         | grep -v 'key="unavailable"' \
-        | head -n 1)
-    API_RESULT_TAG=$(echo "$API_RESULT_TAG" | sed 's/" /"\n/g')
+    )
     # Helper function to extract a tag.
-    # The sed is because we're not actually decoding XML, and things like
+    # The 2nd sed is because we're not actually decoding XML, and things like
     # apostrophes are represented by HTML entities like &apos;.
     extract_tag() {
-        TAG="${1}"
-        echo "$API_RESULT_TAG" | grep "^$TAG=" | cut -d '"' -f 2 \
+        local line="${1:?}"
+        local tag="${2:?}"
+        echo "${line}" | sed 's/" /"\n/g' | grep "^${tag}=" | cut -d '"' -f 2 \
             | sed "s/&apos;/\'/g"
     }
     # Display the details we're interested in - name, subtext, URL.
-    echo "$(extract_tag text)" >&2
-    echo "$(extract_tag subtext)" >&2
-    echo "$(extract_tag URL)" >&2
-    # Throw the URL in a variable for later purposes.
-    API_URL="$(extract_tag URL)"
-    echo "${API_URL}"
+    local n=0
+    while read line; do
+        #echo "$(extract_tag "$line" URL)" >&2
+        #echo "$(extract_tag "$line" text)" >&2
+        #echo "$(extract_tag "$line" subtext)" >&2
+        LIST[$n]="$(extract_tag "$line" URL) - $(extract_tag "$line" text) $(extract_tag "$line" subtext)"
+        ((n++))
+    done <<< "${API_RESULT_TAG:?}"
+    #printf "%s\n" "${LIST[@]}" >&2
+    # Let the user choose ...
+    select option in "${LIST[@]}"; do
+        break
+    done <> /dev/tty
+    # REPLY is 1-based, while LIST index is 0-based
+    ((REPLY--))
+    # Return the 1st word (URL)
+    URL=$(echo "${LIST[$REPLY]}" | sed 's/ .*//')
+    curl -L "${URL}" >&2
+    echo "${URL}"
 }
 tunein_search() {
     local query=${*:?} streamurl api_url
     query="${query// /+}"
-    if [ -f ~/etc/radiocache.d/${query} ]; then
-        streamurl=$(cat ~/etc/radiocache.d/${query})
-    else
-        api_url=$(tunejack ${query})
-        streamurl=$(curl -s "${api_url}")
-    fi
+    api_url=$(tunejack ${query:?}) || return 1
+    streamurl=$(curl -s "${api_url}")
     echo "*** streamurl=${streamurl:?}" >&2
     echo ${streamurl}
 }
@@ -108,13 +118,13 @@ case "$0" in
     *)  exit 1;;
 esac
 
-CMD="mplayer -prefer-ipv4 $MPLAYER_CACHE"
+CMD="vlc -I ncurses $MPLAYER_CACHE"
 if [ -n "$SAVE" ]; then
     #CMD="ffmpeg -c copy $SAVE -i"
     CMD="mplayer -prefer-ipv4 -dumpstream -dumpfile $SAVE"
 fi
 [ -n "$VERBOSE" ] && set -x
-URL=$($cache_func tunein_search "${search:?}") || exit 1
+URL=$(tunein_search "${search:?}") || exit 1
 : "${URL:?}"
 set -x
 exec ${CMD} "${@}" "${URL}"

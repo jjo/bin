@@ -3,7 +3,7 @@
 EXTRAS=(
     --exclude='.minikube**'
     --exclude='.minishift**'
-    --exclude='go/**'
+    --exclude='XXXgo/**'
     --exclude='snap/**'
     --exclude='**Downloads**'
     --exclude='**.bundler**'
@@ -17,6 +17,7 @@ EXTRAS=(
     --exclude='.wine**'
     --exclude='winehome**'
     --exclude='tmp**'
+    --exclude='pCloud**'
 )
 
-rsync -vaPWSH ${EXTRAS[@]} --delete "${HOME}" "${@}"
+rsync -vaPWSH ${EXTRAS[@]} --delete "${HOME%/}/" "${@}"
