@@ -10,11 +10,12 @@ done
 
 echo SAVE=$SAVE
 #URI=https://latamstreaming-live-os.akamaized.net/live_passthrough_static/ammdz/playlist.m3u8
-URI=http://lino.lsdlive.com/mdz.mp3
+#URI=http://lino.lsdlive.com/mdz.mp3
+URI=https://ice2.edge-apps.net/mdzradio1.audio
 
 case $(uname -s) in
-    Darwin) PLAYER="vlc -I ncurses ${@}";;
-    *) PLAYER="mplayer -prefer-ipv4 ${@}";;
+    Darwin|Linux) PLAYER="vlc -I ncurses ${@}";;
+    #*) PLAYER="mplayer -prefer-ipv4 ${@}";;
 esac
 case "$SAVE" in
     "") exec ${PLAYER} "${URI}";;
