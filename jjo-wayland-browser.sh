@@ -4,7 +4,7 @@ XTRA=""
 BROWSER=""
 case ${XDG_SESSION_TYPE:?} in
     wayland)
-        CHROME_XTRA="--enable-features=UseOzonePlatform --ozone-platform=wayland"
+        CHROME_XTRA="--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-features=WebRTCPipeWireCapturer"
         export MOZ_ENABLE_WAYLAND=1 MOZ_USE_XINPUT2=1
         ;;
 esac

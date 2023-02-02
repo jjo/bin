@@ -16,9 +16,9 @@ MAIN_MATCH=H4ZN900103      # Samsung 31" S/N
 RIGHT_MATCH=R9F1P45O9M0L   # Dell 24" S/N
 BUILTIN_MATCH="Manufacturer:?BOE"  # X1 Gen9 builtin display (no S/N, match by Manufacturer)
 
-MAIN_X="-r 50"
-LEFT_X="-r 50"
-RIGHT_X="-r 50"
+MAIN_X="-r 50 --scale 1.0x1.0"
+LEFT_X="-r 50 --scale 1.0x1.0"
+RIGHT_X="-r 50 --scale 1.0x1.0"
 BUILTIN_X="" # "--scale 0.95x0.95"
 
 
