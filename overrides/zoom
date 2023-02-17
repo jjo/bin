@@ -1,0 +1,4 @@
+#!/bin/bash
+# previously:
+#   sudo dpkg-divert --divert /usr/bin/zoom.orig --rename /usr/bin/zoom
+exec ~/bin/jjo-run-ubuntu.sh /usr/bin/zoom.orig "${@}"
