@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Wayland wrappers for browsers to get pinch-to-zoom
 XTRA=""
 BROWSER=""
@@ -15,5 +15,8 @@ case "$0" in
     *chrome*) BROWSER=google-chrome; XTRA="${CHROME_XTRA}";;
     *chromium*) BROWSER=chromium-browser; XTRA="${CHROME_XTRA}";;
     *firefox*) BROWSER=firefox; XTRA="";;
+    *slack*) BROWSER=slack; XTRA="${CHROME_XTRA}";;
 esac
+# remove bin/overrides from PATH
+export PATH="${PATH//overrides/}"
 exec ${BROWSER:?} ${XTRA} "${@}"
