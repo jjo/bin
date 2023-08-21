@@ -3,4 +3,4 @@ infile=${1:?missing infile.pdf}
 outfile=${2:?missing outfile.pdf}
 test -f ${outfile:?} && echo "ERROR: ${outfile} already exists" && exit 1
 set -x
-ghostscript -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outfile:?}" "${infile:?}"
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outfile:?}" "${infile:?}"
