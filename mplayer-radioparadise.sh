@@ -3,8 +3,8 @@ stream=aac-
 qual=320
 while [ $# -gt 0 ]; do
     case "$1" in
-        -rock|-mellow|-eclectic|-world) stream=${1#-}-; shift;;
-        -64|-128|-320) qual=${1#-}; shift;;
+        -rock|-mellow|-eclectic|-global|-world) stream=${1#-}-; shift;;
+        -64|-128|-192|-320) qual=${1#-}; shift;;
         -flac) qual=${1#-}; shift;;
         *) break;;
     esac
