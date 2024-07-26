@@ -2,7 +2,8 @@
 # "kill" desktop apps, sp to save battery, e.g. $0 STOP / $0 CONT
 signal=${1:?Missing signal e.g.: STOP|CONT}
 shift
-PATT='telegram-desktop|brave|chrome|slack|keybase|zoom|dropbox'
+#PATT='telegram-desktop|brave|chrome|slack|keybase|zoom|dropbox'
+PATT='telegram-desktop|brave|chrome|slack|zoom|spotify'
 remove=""
 for i in "$@"; do
     case "$i" in

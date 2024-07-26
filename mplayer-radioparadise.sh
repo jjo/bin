@@ -4,7 +4,7 @@ qual=320
 while [ $# -gt 0 ]; do
     case "$1" in
         -rock|-mellow|-eclectic|-global|-world) stream=${1#-}-; shift;;
-        -64|-128|-192|-320) qual=${1#-}; shift;;
+        -32|-64|-128|-192|-320) qual=${1#-}; shift;;
         -flac) qual=${1#-}; shift;;
         *) break;;
     esac
