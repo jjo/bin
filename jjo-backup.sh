@@ -1,11 +1,11 @@
 #!/bin/bash
-: ${@:?missing args, e.g. /media/${USER}/DISK/DIR/home/jjo/}
+: ${@:?missing args, e.g. /home/ /media/${USER}/DISK/DIR/home/}
 EXTRAS=(
     --exclude='.minikube**'
     --exclude='.minishift**'
     --exclude='XXXgo/**'
     --exclude='snap/**'
-    --exclude='**Downloads**'
+    --exclude='**XXDownloads**'
     --exclude='**.bundler**'
     --exclude='**cache**'
     --exclude='**Cache**'
@@ -20,4 +20,5 @@ EXTRAS=(
     --exclude='pCloud**'
 )
 
-rsync -vaPWSH ${EXTRAS[@]} --delete "${HOME%/}/" "${@}"
+set -x
+rsync -xvaPWSH ${EXTRAS[@]} --delete "${@}"
