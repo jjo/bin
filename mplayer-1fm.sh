@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # mplayer-1fm.sh - Play 1.FM internet radio streams
 # Uses mplayer on Linux, cvlc on macOS
@@ -105,7 +105,10 @@ detect_player() {
             fi
             ;;
         Darwin*)
-            if command -v cvlc &> /dev/null; then
+            if command -v vlc &> /dev/null; then
+                PLAYER="vlc"
+                PLAYER_OPTS="-I ncurses"
+            elif command -v cvlc &> /dev/null; then
                 PLAYER="cvlc"
                 PLAYER_OPTS="--play-and-exit"
             elif command -v /Applications/VLC.app/Contents/MacOS/VLC &> /dev/null; then
