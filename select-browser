@@ -1,0 +1,14 @@
+#!/bin/bash
+# Use:
+#   xdg-settings set default-web-browser select-browser.desktop
+
+BRAVE=TRUE
+CHROME=FALSE
+FIREFOX=FALSE
+
+case "$*" in
+    *awsapps.com*|*okta*|*grafana.com*|*github.com/grafana*) CHROME=true ; BRAVE=false ; FIREFOX=false ;;
+esac
+
+BROWSER="$(zenity --list --radiolist --text '' --column='check' --column=browser --title='select your browser' $BRAVE "brave-browser" $CHROME "google-chrome-stable" $FIREFOX "firefox")"
+exec $BROWSER "$@" &
