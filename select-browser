@@ -11,4 +11,5 @@ case "$*" in
 esac
 
 BROWSER="$(zenity --list --radiolist --text '' --column='check' --column=browser --title='select your browser' $BRAVE "brave-browser" $CHROME "google-chrome-stable" $FIREFOX "firefox")"
-exec $BROWSER "$@" &
+[[ -z "$BROWSER" ]] && exit 1
+exec "$BROWSER" "$@" &

@@ -10,6 +10,7 @@ case ${XDG_SESSION_TYPE:?} in
             #--enable-features=WebRTCPipeWireCapturer
         )
         export MOZ_ENABLE_WAYLAND=1 MOZ_USE_XINPUT2=1
+        export CHROME_ENABLE_WAYLAND=1
         ;;
 esac
 
