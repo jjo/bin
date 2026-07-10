@@ -63,6 +63,7 @@ usage:
   $0 backup --dry-run <path>...   estimate only: show what would be backed up / excluded
   $0 list [path...]               list snapshots (optionally for given paths)
   $0 prune [options]              force-delete old snapshots beyond retention
+  $0 restore <id>[/subdir] <target>  restore a snapshot (optionally a subdir) to a local dir
   $0 kopia <args...>              run any kopia subcommand against the repo
 
 prune options:
@@ -166,6 +167,23 @@ do_prune() {
   _kopia snapshot expire "${args[@]}"
 }
 
+# === NEW: restore a snapshot ===
+
+do_restore() {
+  [ "$#" -ge 2 ] && [ "$#" -le 3 ] || { echo >&2 "restore requires: <snapshot-id>[/subdir] <target-dir>"; usage; }
+  ensure_connected
+  local SRC="$1"
+  local TARGET="$2"
+
+  # If a subpath was given, append it: snapshot-id + subpath -> snapshot-id/subpath
+  if [ "$#" -eq 3 ]; then
+    SRC="${1}/${3}"
+  fi
+
+  echo "Restoring ${SRC} -> ${TARGET} ..."
+  _kopia snapshot restore "${SRC}" "${TARGET}"
+}
+
 main() {
   # Pull --dry-run out from anywhere on the command line.
   local a; local rest=()
@@ -198,6 +216,10 @@ main() {
     prune)
       shift
       do_prune "$@"
+      ;;
+    restore)
+      shift
+      do_restore "$@"
       ;;
     kopia)
       # Passthrough: run any kopia subcommand against the connected repo.
