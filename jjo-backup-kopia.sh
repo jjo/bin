@@ -54,6 +54,8 @@ IGNORES=(
 )
 
 DRY_RUN=0
+# Extra args forwarded to every kopia invocation (collected from any cmd)
+KOPIA_EXTRA_ARGS=()
 
 usage() {
   cat >&2 <<USAGE
@@ -73,6 +75,9 @@ prune options:
 prune applies your configured retention policy (keep-latest, keep-daily, etc.).
 Without --force, it shows what would be deleted (kopia's default dry-run mode).
 With --force, it actually deletes snapshots beyond the policy.
+
+Any unrecognized --flag is forwarded directly to the kopia CLI
+(e.g. --parallel=1, --progress, --all, --older-than=30d, etc).
 
 --dry-run may appear anywhere on the line; it only affects 'backup'.
 USAGE
@@ -117,7 +122,7 @@ do_backup() {
   local SRC verb=create
   [ "$DRY_RUN" -eq 1 ] && verb=estimate
   for SRC in "$@"; do
-    _kopia snapshot "${verb}" "${SRC}"
+    _kopia snapshot "${KOPIA_EXTRA_ARGS[@]}" "${verb}" "${SRC}"
   done
 }
 
@@ -164,7 +169,7 @@ do_prune() {
     esac
   fi
 
-  _kopia snapshot expire "${args[@]}"
+  _kopia snapshot expire "${KOPIA_EXTRA_ARGS[@]}" "${args[@]}"
 }
 
 # === NEW: restore a snapshot ===
@@ -181,15 +186,16 @@ do_restore() {
   fi
 
   echo "Restoring ${SRC} -> ${TARGET} ..."
-  _kopia snapshot restore "${SRC}" "${TARGET}"
+  _kopia snapshot restore "${KOPIA_EXTRA_ARGS[@]}" "${SRC}" "${TARGET}"
 }
 
 main() {
-  # Pull --dry-run out from anywhere on the command line.
+  # Pull --dry-run out from anywhere; any other --flag gets passed to kopia.
   local a; local rest=()
   for a in "$@"; do
     case "$a" in
       --dry-run) DRY_RUN=1 ;;
+      --*) KOPIA_EXTRA_ARGS+=("$a") ;;
       *) rest+=("$a") ;;
     esac
   done
@@ -211,7 +217,7 @@ main() {
     list)
       shift
       ensure_connected
-      _kopia snapshot list "$@"
+      _kopia snapshot list "${KOPIA_EXTRA_ARGS[@]}" "$@"
       ;;
     prune)
       shift
@@ -225,7 +231,7 @@ main() {
       # Passthrough: run any kopia subcommand against the connected repo.
       shift
       ensure_connected
-      _kopia "$@"
+      _kopia "${KOPIA_EXTRA_ARGS[@]}" "$@"
       ;;
     *)
       usage
