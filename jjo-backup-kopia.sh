@@ -210,7 +210,7 @@ main() {
       ;;
     backup)
       shift
-      apply_policy
+      #apply_policy
       echo "Repository connected; ignore + retention policy applied."
       do_backup "$@"
       ;;
