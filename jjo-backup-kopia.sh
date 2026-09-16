@@ -51,6 +51,7 @@ IGNORES=(
   'winehome*'
   'tmp*'
   'pCloud*'             # don't back up the pCloud mount itself
+  '.local/var*'
 )
 
 DRY_RUN=0
@@ -210,7 +211,7 @@ main() {
       ;;
     backup)
       shift
-      #apply_policy
+      apply_policy
       echo "Repository connected; ignore + retention policy applied."
       do_backup "$@"
       ;;
