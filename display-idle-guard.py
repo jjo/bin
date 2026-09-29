@@ -65,6 +65,10 @@ except ImportError:  # pragma: no cover
     sys.exit("display-idle-guard: python3-gi is required (apt install python3-gi)")
 
 LOGIN1_SESSION = "org.freedesktop.login1.Session"
+# BTN_* codes start at 0x100; only the range below is real typing. Needed because
+# the ELAN touchpad reports as a non-pointer node and emits BTN_TOUCH/BTN_LEFT,
+# which would otherwise masquerade as somebody at the keyboard.
+KEY_CODE_END = 0x100
 
 
 # --------------------------------------------------------------------------- #
@@ -158,6 +162,10 @@ class RealIO:
         return seen
 
     def grab(self, paths):
+        if self.opts.dry_run:
+            if paths:
+                self.log(f"DRY-RUN would grab {len(paths)} pointer(s)")
+            return
         for path in paths:
             if path in self.grabbed:
                 continue
@@ -354,7 +362,11 @@ class Watcher:
         if self.io.is_pointer(dev):
             return True          # phantom BTN presses: never a wake/presence source
         for ev in events:
-            if ev.type == evdev.ecodes.EV_KEY and ev.value == 1:
+            # Keyboard code range only: BTN_* shows up on non-pointer nodes too
+            # (the touchpad reports BTN_TOUCH/BTN_LEFT) and is not evidence of a
+            # human at the keyboard.
+            if (ev.type == evdev.ecodes.EV_KEY and ev.value == 1
+                    and ev.code < KEY_CODE_END):
                 self.guard.on_key()
         return True
 
