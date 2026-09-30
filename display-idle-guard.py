@@ -26,6 +26,13 @@ grabbed on a live desktop. So:
   * Lock signal -> one-shot: grab the pointers FIRST, then force the displays
     off (grab first: the phantom stream is ~77 ev/s, so an ungrabbed display is
     woken again within milliseconds).
+  * If the displays come back on moments after we forced them off (measured: the
+    compositor mapping the lock surface, t+1..5 s), re-assert the blank for a
+    bounded window (--reon-guard) rather than handing the pointer back at once.
+  * The lock blank is deliberately delayed (--lock-blank-delay, default 120 s):
+    the panel stays legible for a beat after locking, then goes dark and stays
+    dark. Set 0 to blank the instant the lock signal arrives. With idle-blank at
+    0 this makes locking the ONLY thing that can power the displays off.
   * While every connected output is dpms=Off -> keep the pointers grabbed so
     nothing can wake the displays.
   * Any key press -> power the displays on, release the grab, and stand off for
@@ -248,7 +255,10 @@ class Guard:
         # --idle-blank set would treat the screen as idle since boot and blank
         # the displays the instant it comes up.
         self.last_key = self.io.now()
-        self.last_force_off = -1e9
+        self.last_force_off = -1e9     # when we last forced the displays off
+        self.last_reon = -1e9          # when we last re-asserted such a blank
+        self.reon_until = -1e9         # hard deadline for re-asserting a blank
+        self.lock_off_at = None        # pending delayed blank after a lock
         self.stats = Counter()
 
     @property
@@ -266,25 +276,37 @@ class Guard:
         self.stats["keys"] += 1
         self.last_key = now
         self.no_grab_until = now + self.opts.key_grace
+        self.reon_until = -1e9           # a human is here: stop any re-asserting
+        self.lock_off_at = None          # ... and cancel a pending lock blank
         if self.grabbed:
             self.io.outputs_on()
             self.release("key")
 
     def on_lock(self, now=None):
-        """One-shot: grab first, then power off.
+        """Blank on lock - by default after --lock-blank-delay seconds.
 
-        Grab precedes the power-off because the phantom stream (~77 ev/s) would
-        otherwise wake the display again within milliseconds.
+        With a delay the pointer is deliberately left FREE until the blank lands
+        (grabbing now would hold it through the whole delay), and the blank is
+        cancelled by any key press or by the Unlock signal. With no delay, grab
+        FIRST and then power off: the phantom stream (~77 ev/s) would otherwise
+        wake the display again within milliseconds.
         """
         now = self._now(now)
         self.stats["locks"] += 1
-        self.grab()
         self.hold_until = now + self.opts.lock_hold
-        if self.opts.power_off_on_lock:
-            self.io.outputs_off()
+        if not self.opts.power_off_on_lock:
+            self.lock_off_at = None
+            return
+        if self.opts.lock_blank_delay > 0:
+            self.lock_off_at = now + self.opts.lock_blank_delay
+            return
+        self.lock_off_at = None
+        self.grab()
+        self.power_off(now)
 
     def on_unlock(self, now=None):
         self.stats["unlocks"] += 1
+        self.lock_off_at = None
         self.release("unlock")
         self.io.outputs_on()
 
@@ -303,21 +325,59 @@ class Guard:
         self.io.release()
         self.log(f"resume ({reason})")
 
+    def power_off(self, now):
+        """Force the displays off and arm a bounded re-assert window.
+
+        A fresh off (lock, idle blank) arms the window; re-asserting one must NOT
+        extend it, or the daemon could keep fighting a live desktop forever.
+        """
+        if not self.io.outputs_off():
+            return False
+        self.last_force_off = now
+        self.reon_until = now + self.opts.reon_guard
+        self.stats["power_offs"] += 1
+        return True
+
     # ---- periodic ----
     def tick(self, now, outputs_off):
-        # Displays back on and the lock-grab has settled: the pointer belongs to
-        # the user again. This self-healing rule is why no stale lock flag exists.
-        if self.grabbed and not outputs_off and now >= self.hold_until:
-            self.release("displays on")
-        # Displays off: nothing may wake them (also re-grabs new BT nodes).
-        if outputs_off and now >= self.no_grab_until and self.opts.on_display_off:
-            self.grab()
+        # A deliberately delayed lock blank (cancelled by keys/unlock above).
+        if (not outputs_off and self.lock_off_at is not None
+                and now >= self.lock_off_at):
+            if self.power_off(now):
+                self.lock_off_at = None
+                self.stats["lock_blanks"] += 1
+                return
+        if outputs_off:
+            self.last_reon = -1e9
+            # Displays off: nothing may wake them (also re-grabs new BT nodes).
+            if now >= self.no_grab_until and self.opts.on_display_off:
+                self.grab()
+            return
+        # The displays are on from here on.
+        if self.grabbed:
+            if (self.opts.reon_guard and now <= self.reon_until
+                    and now - self.last_reon >= 1.0):
+                # Something powered them back on right after we forced them off
+                # (measured: the compositor mapping the lock surface, t+1..5s).
+                # Re-assert until the window armed by power_off() lapses - never
+                # extending it - so this can delay the release but never prevent
+                # it. That bound is what keeps a stale state from stranding the
+                # pointer on a live desktop.
+                self.last_reon = now
+                self.last_force_off = now      # keep the idle-blank rate limit honest
+                self.log("displays came back on; re-asserting off")
+                if self.io.outputs_off():
+                    self.stats["reons"] += 1
+                return
+            # Self-healing and bounded: the pointer is never stranded on a live
+            # desktop, whatever the display state says.
+            if now >= self.hold_until:
+                self.release("displays on")
         # Opt-in: ignore the pointer entirely for idleness.
-        if (self.opts.idle_blank and not outputs_off
+        if (self.opts.idle_blank
                 and now - self.last_key > self.opts.idle_blank
                 and now - self.last_force_off > 1.0):
-            if self.io.outputs_off():
-                self.last_force_off = now
+            if self.power_off(now):
                 self.stats["idle_blanks"] += 1
 
     def cleanup(self):
@@ -378,6 +438,8 @@ class Watcher:
             s = self.guard.stats
             self.log(f"stats grabbed={self.guard.grabbed} keys={s['keys']} "
                      f"locks={s['locks']} unlocks={s['unlocks']} grabs={s['grabs']} "
+                     f"power_offs={s['power_offs']} reons={s['reons']} "
+                     f"lock_blanks={s['lock_blanks']} "
                      f"idle_blanks={s['idle_blanks']}")
         return True
 
@@ -393,6 +455,12 @@ def main(argv=None):
     ap.add_argument("--lock-hold", type=float, default=5.0,
                     help="seconds a lock-triggered grab is held even if the displays "
                          "already read On (default 5)")
+    ap.add_argument("--lock-blank-delay", type=float, default=120.0,
+                    help="seconds after a lock before the displays are forced off "
+                         "(0 = immediately)")
+    ap.add_argument("--reon-guard", type=float, default=20.0,
+                    help="after forcing the displays off, re-assert the blank for at "
+                         "most N seconds if something powers them back on (0 = never)")
     ap.add_argument("--idle-blank", type=float, default=0.0,
                     help="force displays off after N seconds of no KEYBOARD input "
                          "(pointer motion excluded; 0 = off)")
